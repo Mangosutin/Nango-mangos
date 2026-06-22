@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高度な難語データビューアー</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --muted-color: #7f8c8d;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+
+        /* ツールバー（インポート・エクスポートなど） */
+        .toolbar {
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn-primary { background: var(--accent-color); color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-success { background: var(--success-color); color: white; }
+        .btn-success:hover { background: #27ae60; }
+        .btn-danger { background: var(--danger-color); color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-secondary { background: #95a5a6; color: white; }
+        .btn-secondary:hover { background: #7f8c8d; }
+
+        #fileInput { display: none; }
+
+        /* セレクター（切り替え部分） */
+        .selector-container {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .word-btn {
+            background-color: var(--card-bg);
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .word-btn:hover { background-color: #eee; }
+        .word-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* メインエリア（ビュー・編集） */
+        .main-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .word-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-top: 25px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title::before {
+            content: "◆";
+            margin-right: 6px;
+            font-size: 12px;
+        }
+
+        .meaning-box {
+            background-color: #eef7fc;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .text-content {
+            font-size: 15px;
+            color: #444;
+            text-align: justify;
+            white-space: pre-wrap;
+        }
+
+        .example-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        .example-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        .example-list li::before { content: "「"; position: absolute; left: 0; color: var(--muted-color); }
+        .example-list li::after { content: "」"; color: var(--muted-color); }
+
+        .synonym-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+        .synonym-tag { background-color: #f1f3f5; color: #495057; padding: 4px 12px; border-radius: 15px; font-size: 14px; }
+
+        /* 編集フォームスタイル */
+        .edit-form { display: none; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: var(--primary-color); }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        textarea.form-control { resize: vertical; min-height: 80px; }
+        .form-actions { display: flex; gap: 10px; margin-top: 20px; }
+
+        /* 空の状態 */
+        .empty-message { text-align: center; color: var(--muted-color); padding: 4px 0; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>難語データビューアー Pro</h1>
+    </header>
+
+    <div class="toolbar">
+        <div>
+            <button class="btn btn-primary" onclick="triggerImport()">JSONインポート</button>
+            <input type="file" id="fileInput" accept=".json" onchange="importJSON(event)">
+            <button class="btn btn-success" id="exportBtn" onclick="exportJSON()">JSONエクスポート</button>
+        </div>
+        <div>
+            <button class="btn btn-primary" onclick="showNewForm()">＋ 新規単語追加</button>
+            <button class="btn btn-danger" onclick="resetToDefault()">初期状態にリセット</button>
+        </div>
+    </div>
+
+    <div class="selector-container" id="selectorContainer"></div>
+
+    <div class="main-content">
+        <div id="viewMode">
+            <div style="float: right;">
+                <button class="btn btn-secondary" id="editBtn" onclick="showEditForm()">この単語を編集</button>
+                <button class="btn btn-danger" id="deleteBtn" style="padding: 8px 12px;" onclick="deleteCurrentWord()">削除</button>
+            </div>
+            <div id="viewTarget"></div>
+        </div>
+
+        <div id="editMode" class="edit-form">
+            <h2 id="formTitle" style="margin-top:0; color: var(--primary-color);">単語の編集</h2>
+            <div class="form-group">
+                <label for="editWord">単語（表記）</label>
+                <input type="text" id="editWord" class="form-control" placeholder="例: カスケード（cascade）">
+            </div>
+            <div class="form-group">
+                <label for="editMeaning">意味</label>
+                <textarea id="editMeaning" class="form-control" placeholder="言葉の意味を入力"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editBackground">背景 / 由来</label>
+                <textarea id="editBackground" class="form-control" placeholder="言葉の背景や歴史、由来を入力"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editNuance">ニュアンス</label>
+                <textarea id="editNuance" class="form-control" placeholder="使われる際の細かいニュアンスを入力"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editExamples">例文（1行に1文ずつ入力してください）</label>
+                <textarea id="editExamples" class="form-control" style="min-height: 100px;" placeholder="例文1&#10;例文2&#10;例文3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editSynonyms">類義語（カンマ「,」区切り、または改行で入力してください）</label>
+                <textarea id="editSynonyms" class="form-control" placeholder="連鎖, 波及, ドミノ倒し"></textarea>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-success" onclick="saveWord()">保存</button>
+                <button class="btn btn-secondary" onclick="cancelEdit()">キャンセル</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// デフォルトの初期データ
+const defaultData = [
+  {
+    "word": "カスケード（cascade）",
+    "meaning": "連鎖的に物事が起きること。または、上から下へ階段状に流れ落ちる滝や、そのように連なるものを指す。",
+    "background": "原語はイタリア語の「cascata（滝）」やラテン語の「cadere（落ちる）」に由来し、元々は「小さな連なった滝」を意味していました。そこから派生して、現代ではIT、ビジネス、科学など様々な分野で「一つの事象が次の事象を芋づる式に引き起こす仕組みや現象」を指す言葉として広く使われています。",
+    "nuance": "単に物事が連続するだけでなく、「上流から下流へ」「1つが引き金となって次々と自動的・不可避的に」伝播していくという、力強い連鎖のニュアンスを含みます。IT分野では機能の連鎖、ビジネスでは方針の浸透、医療では拒絶反応の連鎖など、文脈によってポジティブにもネガティブにも使われます。",
+    "examples": [
+      "経営陣が決定した経営戦略を、各部門へカスケードダウン（一貫して浸透）させる。",
+      "システムの1ヶ所で発生したバグが、カスケード障害を引き起こしてサーバー全体がダウンした。",
+      "CSS（Cascading Style Sheets）は、スタイルの優先順位が上から下へと連鎖的に適用される仕組みに基づいている。"
+    ],
+    "synonyms": ["連鎖", "ドミノ倒し", "波及", "芋づる式", "数珠繋ぎ"]
+  },
+  {
+    "word": "かしずく（傅く）",
+    "meaning": "人に仕えて 大事に世話をする。また、子供を大切に養い育てる。",
+    "background": "古語の「かしづく」に由来する言葉です。平安時代の貴族社会において、身分の高い人に仕えて身の回りの世話をすることや、親が大切な我が子をいつくしみ、手を尽くして育てることを指す言葉として広く使われていました。現代では主に前者の「仕える」という意味合いが強く残っています。",
+    "nuance": "単にお世話をするだけでなく、相手に対して「深い敬意」や「愛情」を持って、至れり尽くせりでもてなすというニュアンスが含まれます。現代の日常会話で使われることは稀で、小説や漫画などの創作物、あるいは格式高い表現の中で、主従関係や献身的な態度を強調する際によく用いられます。",
+    "examples": [
+      "若き女王の周りには、彼女に傅く大勢の侍従たちが控えていた。",
+      "主人の一言で、使用人たちは一斉に傅いて命令に従った。",
+      "両親から蝶よ花よと傅かれて育ったため、彼女は世間知らずなところがある。"
+    ],
+    "synonyms": ["仕える（つかえる）", "かしずき奉る", "お世話する", "奉公する", "傅育する（ふいくする）"]
+  }
+];
+
+// アプリケーションの状態管理
+let wordData = [];
+let currentIndex = 0;
+let isNewWord = false; // 新規追加モードかどうかのフラグ
+
+// 1. 初期化処理 (ブラウザのLocalStorageに保存して状態を維持)
+function initApp() {
+    const savedData = localStorage.getItem('nango_data');
+    if (savedData) {
+        try {
+            wordData = JSON.parse(savedData);
+        } catch(e) {
+            wordData = [...defaultData];
+        }
+    } else {
+        wordData = [...defaultData];
+        saveToLocalStorage();
+    }
+    
+    currentIndex = wordData.length > 0 ? 0 : -1;
+    renderSelector();
+    showViewMode();
+}
+
+function saveToLocalStorage() {
+    localStorage.setItem('nango_data', JSON.stringify(wordData));
+}
+
+// 2. 描画処理
+function renderSelector() {
+    const container = document.getElementById('selectorContainer');
+    container.innerHTML = '';
+    
+    wordData.forEach((data, index) => {
+        const button = document.createElement('button');
+        button.className = `word-btn ${index === currentIndex ? 'active' : ''}`;
+        // ボタンに表示する文字をすっきりさせる
+        button.textContent = data.word ? data.word.split('（')[0].split('(')[0] : '無題'; 
+        button.addEventListener('click', () => {
+            currentIndex = index;
+            document.querySelectorAll('.word-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            showViewMode();
+        });
+        container.appendChild(button);
+    });
+
+    // エクスポートボタンの有効/無効化
+    document.getElementById('exportBtn').disabled = wordData.length === 0;
+}
+
+function showViewMode() {
+    document.getElementById('editMode').style.display = 'none';
+    document.getElementById('viewMode').style.display = 'block';
+    
+    const target = document.getElementById('viewTarget');
+    const editBtn = document.getElementById('editBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+
+    if (currentIndex === -1 || wordData.length === 0) {
+        target.innerHTML = '<div class="empty-message">データがありません。「新規単語追加」または「JSONインポート」からデータを登録してください。</div>';
+        editBtn.style.display = 'none';
+        deleteBtn.style.display = 'none';
+        return;
+    }
+
+    editBtn.style.display = 'inline-block';
+    deleteBtn.style.display = 'inline-block';
+
+    const data = wordData[currentIndex];
+    const examplesHtml = (data.examples || []).map(ex => `<li>${ex}</li>`).join('');
+    const synonymsHtml = (data.synonyms || []).map(syn => `<span class="synonym-tag">${syn}</span>`).join('');
+
+    target.innerHTML = `
+        <h2 class="word-title">${data.word || ''}</h2>
+        
+        <div class="section-title">意味</div>
+        <div class="meaning-box">${data.meaning || ''}</div>
+        
+        <div class="section-title">言葉の背景 / 由来</div>
+        <div class="text-content">${data.background || ''}</div>
+        
+        <div class="section-title">ニュアンス</div>
+        <div class="text-content">${data.nuance || ''}</div>
+        
+        <div class="section-title">例文</div>
+        <ul class="example-list">${examplesHtml || '<li>（登録なし）</li>'}</ul>
+        
+        <div class="section-title">類義語</div>
+        <div class="synonym-container">${synonymsHtml || '<span style="color:var(--muted-color); font-size:14px;">（登録なし）</span>'}</div>
+    `;
+}
+
+// 3. 編集・新規追加機能
+function showEditForm() {
+    isNewWord = false;
+    document.getElementById('formTitle').textContent = "単語の編集";
+    document.getElementById('viewMode').style.display = 'none';
+    document.getElementById('editMode').style.display = 'block';
+
+    const data = wordData[currentIndex];
+    document.getElementById('editWord').value = data.word || '';
+    document.getElementById('editMeaning').value = data.meaning || '';
+    document.getElementById('editBackground').value = data.background || '';
+    document.getElementById('editNuance').value = data.nuance || '';
+    document.getElementById('editExamples').value = (data.examples || []).join('\n');
+    document.getElementById('editSynonyms').value = (data.synonyms || []).join(', ');
+}
+
+function showNewForm() {
+    isNewWord = true;
+    document.getElementById('formTitle').textContent = "新規単語追加";
+    document.getElementById('viewMode').style.display = 'none';
+    document.getElementById('editMode').style.display = 'block';
+
+    // フォームをクリア
+    document.getElementById('editWord').value = '';
+    document.getElementById('editMeaning').value = '';
+    document.getElementById('editBackground').value = '';
+    document.getElementById('editNuance').value = '';
+    document.getElementById('editExamples').value = '';
+    document.getElementById('editSynonyms').value = '';
+}
+
+function cancelEdit() {
+    showViewMode();
+}
+
+function saveWord() {
+    const word = document.getElementById('editWord').value.trim();
+    if (!word) {
+        alert('単語（表記）は必須入力です。');
+        return;
+    }
+
+    // 例文と類義語のテキストを配列に変換
+    const examplesText = document.getElementById('editExamples').value;
+    const examples = examplesText.split('\n').map(line => line.trim()).filter(line => line !== '');
+
+    const synonymsText = document.getElementById('editSynonyms').value;
+    // カンマ、読点、改行のいずれでも区切れるように正規表現で分割
+    const synonyms = synonymsText.split(/[,，、\n]/).map(item => item.trim()).filter(item => item !== '');
+
+    const newWordData = {
+        "word": word,
+        "meaning": document.getElementById('editMeaning').value.trim(),
+        "background": document.getElementById('editBackground').value.trim(),
+        "nuance": document.getElementById('editNuance').value.trim(),
+        "examples": examples,
+        "synonyms": synonyms
+    };
+
+    if (isNewWord) {
+        wordData.push(newWordData);
+        currentIndex = wordData.length - 1;
+    } else {
+        wordData[currentIndex] = newWordData;
+    }
+
+    saveToLocalStorage();
+    renderSelector();
+    showViewMode();
+}
+
+function deleteCurrentWord() {
+    if (currentIndex === -1) return;
+    if (!confirm(`「${wordData[currentIndex].word}」を削除してもよろしいですか？`)) return;
+
+    wordData.splice(currentIndex, 1);
+    
+    if (wordData.length === 0) {
+        currentIndex = -1;
+    } else if (currentIndex >= wordData.length) {
+        currentIndex = wordData.length - 1;
+    }
+
+    saveToLocalStorage();
+    renderSelector();
+    showViewMode();
+}
+
+// 4. インポート・エクスポート・リセット機能
+function triggerImport() {
+    document.getElementById('fileInput').click();
+}
+
+function importJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const imported = JSON.parse(e.target.result);
+            
+            // 単一オブジェクトが来た場合は配列にラップ
+            const dataArray = Array.isArray(imported) ? imported : [imported];
+            
+            if (dataArray.length === 0 || !dataArray[0].word) {
+                throw new Error('正しい難語JSONデータフォーマットではありません。');
+            }
+
+            if (confirm(`JSONデータから ${dataArray.length} 件の単語を読み込みます。現在のリストに追加しますか？\n(「キャンセル」を選ぶと上書きします)`)) {
+                wordData = [...wordData, ...dataArray];
+            } else {
+                wordData = dataArray;
+            }
+
+            currentIndex = wordData.length > 0 ? 0 : -1;
+            saveToLocalStorage();
+            renderSelector();
+            showViewMode();
+            alert('インポートが完了しました。');
+        } catch (err) {
+            alert('JSONファイルの読み込みに失敗しました。フォーマットを確認してください。\nエラー詳細: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+    // 同じファイルを再度選択できるようにリセット
+    event.target.value = '';
+}
+
+function exportJSON() {
+    if (wordData.length === 0) return;
+    
+    const jsonString = JSON.stringify(wordData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '難語データ_export.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function resetToDefault() {
+    if (!confirm('データを最初の初期状態（カスケード、かしずく の2語のみ）に戻しますか？\n自分で追加・編集したデータは消去されます。')) return;
+    
+    wordData = [...defaultData];
+    currentIndex = 0;
+    saveToLocalStorage();
+    renderSelector();
+    showViewMode();
+}
+
+// 起動
+initApp();
+</script>
+
+</body>
+</html>

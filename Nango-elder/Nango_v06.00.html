@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>超高度な難語データビューアー Pro</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --muted-color: #7f8c8d;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --border-color: #cbd5e0;
+            --tag-field-bg: #e2f0fd;
+            --tag-field-color: #2b6cb0;
+            --tag-era-bg: #fef3c7;
+            --tag-era-color: #92400e;
+            --sync-color: #9b59b6;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 26px;
+            margin: 0;
+        }
+
+        /* 自動同期の通知バー */
+        .sync-notice {
+            display: none;
+            background: #e8f8f5;
+            border: 1px solid #a3e4d7;
+            color: #117a65;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ツールバー */
+        .toolbar {
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn-primary { background: var(--accent-color); color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-success { background: var(--success-color); color: white; }
+        .btn-success:hover { background: #27ae60; }
+        .btn-danger { background: var(--danger-color); color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-secondary { background: #95a5a6; color: white; }
+        .btn-secondary:hover { background: #7f8c8d; }
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-warning:hover { background: #d35400; }
+        .btn-sync { background: var(--sync-color); color: white; }
+        .btn-sync:hover { background: #8e44ad; }
+        
+        .btn-sm {
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: white;
+            border: 1px solid var(--border-color);
+            color: #4a5568;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .btn-sm.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        #fileInput, #syncFileInput { display: none; }
+
+        /* メインレイアウト */
+        .main-layout {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        /* サイドバー */
+        .sidebar {
+            width: 320px;
+            min-width: 320px;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .search-box {
+            margin-bottom: 15px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--muted-color);
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .control-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* 階層構造ツリー */
+        .tree-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border-top: 1px solid #edf2f7;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        
+        .tree-category {
+            margin-bottom: 5px;
+        }
+        .tree-category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            background: #f7fafc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .tree-category-header:hover { background: #edf2f7; }
+        .tree-category-title {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tree-toggle-icon {
+            font-size: 10px;
+            transition: transform 0.2s;
+        }
+        .tree-category.open .tree-toggle-icon {
+            transform: rotate(90deg);
+        }
+        
+        .tree-word-list {
+            display: none;
+            padding-left: 15px;
+            margin: 4px 0;
+        }
+        .tree-category.open .tree-word-list {
+            display: block;
+        }
+        
+        .tree-word-item {
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            padding: 6px 10px;
+            margin: 2px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13.5px;
+            color: #4a5568;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+        .tree-word-item:hover { background: #f1f5f9; color: var(--accent-color); }
+        .tree-word-item.active {
+            background-color: #eef7fc;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* メインコンテンツ */
+        .main-content {
+            flex-grow: 1;
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            min-height: 400px;
+            box-sizing: border-box;
+        }
+
+        .word-header-container {
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+        .word-title-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .word-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 0;
+        }
+        .category-badge {
+            background-color: #e2e8f0;
+            color: #4a5568;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .tag-container {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .custom-tag {
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .tag-field { background-color: var(--tag-field-bg); color: var(--tag-field-color); }
+        .tag-era { background-color: var(--tag-era-bg); color: var(--tag-era-color); }
+
+        .word-sub-info {
+            font-size: 13px;
+            color: var(--muted-color);
+            margin-top: 6px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-top: 25px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title::before { content: "◆"; margin-right: 6px; font-size: 12px; }
+
+        .meaning-box {
+            background-color: #eef7fc;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .text-content { font-size: 15px; color: #444; text-align: justify; white-space: pre-wrap; }
+
+        .example-list { list-style: none; padding-left: 0; margin: 0; }
+        .example-list li { position: relative; padding-left: 20px; margin-bottom: 10px; font-size: 15px; }
+        .example-list li::before { content: "「"; position: absolute; left: 0; color: var(--muted-color); }
+        .example-list li::after { content: "」"; color: var(--muted-color); }
+
+        .synonym-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+        .synonym-tag { background-color: #f1f3f5; color: #495057; padding: 4px 12px; border-radius: 15px; font-size: 14px; }
+
+        /* 編集フォーム・管理テーブル */
+        .edit-form, .manage-panel { display: none; }
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .form-group { margin-bottom: 15px; flex-grow: 1; min-width: 150px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: var(--primary-color); font-size: 14px; }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        textarea.form-control { resize: vertical; min-height: 80px; }
+        .form-actions { display: flex; gap: 10px; margin-top: 20px; }
+
+        .tag-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .tag-table th, .tag-table td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: left;
+        }
+        .tag-table th { background-color: #f7fafc; }
+
+        .empty-message { text-align: center; color: var(--muted-color); padding: 40px 0; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>難語データビューアー Pro</h1>
+    </header>
+
+    <div id="syncNotice" class="sync-notice"></div>
+
+    <div class="toolbar">
+        <div>
+            <button class="btn btn-sync" onclick="triggerSync()">🔄 外部JSONと同期</button>
+            <input type="file" id="syncFileInput" accept=".json" onchange="syncWithSelectedFiles(event)" multiple>
+            
+            <button class="btn btn-primary" onclick="triggerImport()">JSONインポート</button>
+            <input type="file" id="fileInput" accept=".json" onchange="importJSON(event)" multiple>
+            
+            <button class="btn btn-success" id="exportBtn" onclick="exportJSON()">JSONエクスポート</button>
+            <button class="btn btn-secondary" onclick="exportTemplateJSON()">📝 テンプレート出力</button>
+            <button class="btn btn-warning" onclick="showManagePanel()">🏷️ 管理＆履歴</button>
+        </div>
+        <div>
+            <button class="btn btn-primary" onclick="showNewForm()">＋ 新規単語追加</button>
+            <button class="btn btn-danger" onclick="resetToDefault()">初期状態にリセット</button>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        
+        <div class="sidebar">
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="検索 (かな, 漢字, タグ, 本文...)" oninput="handleSearch()">
+                
+                <div class="control-group">
+                    <div class="control-row">
+                        <span>階層基準:</span>
+                        <button class="btn-sm active" id="struct-cat" onclick="setHierarchyStructure('category')">分類</button>
+                        <button class="btn-sm" id="struct-field" onclick="setHierarchyStructure('fieldTag')">分野</button>
+                        <button class="btn-sm" id="struct-era" onclick="setHierarchyStructure('eraTag')">時代</button>
+                    </div>
+                    <div class="control-row">
+                        <span>並び替え:</span>
+                        <button class="btn-sm active" id="sort-id" onclick="setSort('id')">登録順</button>
+                        <button class="btn-sm" id="sort-alpha" onclick="setSort('alpha')">五十音順</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tree-container" id="treeContainer">
+                </div>
+        </div>
+
+        <div class="main-content">
+            <div id="viewMode">
+                <div style="float: right;">
+                    <button class="btn btn-secondary" id="editBtn" onclick="showEditForm()">この単語を編集</button>
+                    <button class="btn btn-danger" id="deleteBtn" style="padding: 8px 12px;" onclick="deleteCurrentWord()">削除</button>
+                </div>
+                <div id="viewTarget"></div>
+            </div>
+
+            <div id="editMode" class="edit-form">
+                <h2 id="formTitle" style="margin-top:0; color: var(--primary-color);">単語の編集</h2>
+                
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2; min-width: 250px;">
+                        <label for="editWord">単語（表示名）*必須</label>
+                        <input type="text" id="editWord" class="form-control" placeholder="例: カスケード（cascade）">
+                    </div>
+                    <div class="form-group" style="flex: 1; min-width: 150px;">
+                        <label for="editCategory">単語分類</label>
+                        <select id="editCategory" class="form-control">
+                            <option value="指定なし">指定なし</option>
+                            <option value="外来語">外来語</option>
+                            <option value="熟語">熟語</option>
+                            <option value="慣用句">慣用句</option>
+                            <option value="古語・大和言葉">古語・大和言葉</option>
+                            <option value="その他">その他</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row" style="background: #edf2f7; padding: 12px; border-radius: 6px; margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label for="editFieldTag">分野タグ (例: デザイン、医療、日常など)</label>
+                        <input type="text" id="editFieldTag" class="form-control" placeholder="例: エンジニアリング">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEraTag">時代タグ (例: 近代、中世、現代など)</label>
+                        <input type="text" id="editEraTag" class="form-control" placeholder="例: 現代">
+                    </div>
+                </div>
+
+                <div class="form-row" style="background: #f7fafc; padding: 10px; border-radius: 6px; border: 1px dashed var(--border-color);">
+                    <div class="form-group">
+                        <label for="editReading">よみがな (ひらがな) 【検索用】</label>
+                        <input type="text" id="editReading" class="form-control" placeholder="例: かすけーど">
+                    </div>
+                    <div class="form-group">
+                        <label for="editKanji">漢字表記 【検索用】</label>
+                        <input type="text" id="editKanji" class="form-control" placeholder="例: 傅く">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEnglish">英語・スペル 【検索用】</label>
+                        <input type="text" id="editEnglish" class="form-control" placeholder="例: cascade">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="editMeaning">意味</label>
+                    <textarea id="editMeaning" class="form-control" placeholder="言葉の意味を入力"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editBackground">背景 / 由来</label>
+                    <textarea id="editBackground" class="form-control" placeholder="言葉の背景や歴史、由来を入力"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editNuance">ニュアンス</label>
+                    <textarea id="editNuance" class="form-control" placeholder="使われる際の細かいニュアンスを入力"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editExamples">例文（1行に1文ずつ入力してください）</label>
+                    <textarea id="editExamples" class="form-control" style="min-height: 100px;" placeholder="例文1&#10;例文2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editSynonyms">類義語（カンマ「,」区切り、または改行で入力してください）</label>
+                    <textarea id="editSynonyms" class="form-control" placeholder="連鎖, 波及, ドミノ倒し"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-success" onclick="saveWord()">保存</button>
+                    <button class="btn btn-secondary" onclick="cancelEdit()">キャンセル</button>
+                </div>
+            </div>
+
+            <div id="managePanelMode" class="manage-panel">
+                <h2 style="margin-top:0; color: var(--primary-color);">🏷️ タグ管理 ＆ データ更新履歴</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <h3 style="font-size:16px; margin-bottom:8px; border-left: 4px solid var(--tag-field-color); padding-left: 8px;">分野タグ一覧</h3>
+                    <div id="fieldTagsTableContainer"></div>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3 style="font-size:16px; margin-bottom:8px; border-left: 4px solid var(--tag-era-color); padding-left: 8px;">時代タグ一覧</h3>
+                    <div id="eraTagsTableContainer"></div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h3 style="font-size:16px; margin-bottom:8px; border-left: 4px solid var(--primary-color); padding-left: 8px;">📜 データ更新履歴 (JSON内蔵)</h3>
+                    <p style="font-size:12px; color:var(--muted-color); margin: -4px 0 8px 0;">このデータセットの編集・同期履歴です。保存用JSONファイル内に一緒に書き出されます。</p>
+                    <div id="historyLogContainer" style="max-height: 180px; overflow-y: auto; background: #f1f3f5; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 12px; border: 1px solid var(--border-color); line-height: 1.5;"></div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="closeManagePanel()">閉じる</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+// ★ バージョン定義 (メインHTMLの名前 Nango_vMM.PP.html のMM.PPと一致させてください)
+const VERSION_STR = 'v01.00';
+
+// 内蔵初期サンプルデータ
+const DEFAULT_WORDS = [
+  {
+    "id": 1, "word": "カスケード（cascade）", "category": "外来語", "fieldTag": "IT", "eraTag": "現代", "reading": "かすけーど", "kanji": "", "english": "cascade",
+    "meaning": "連鎖的に物事が起きること。または、上から下へ階段状に流れ落ちる滝や、そのように連なるものを指す。",
+    "background": "原語はイタリア語の「cascata（滝）」やラテン語の「cadere（落ちる）」に由来します。",
+    "nuance": "「上流から下流へ」「1つが引き金となって次々と自動的・不可避的に」伝播していくニュアンスを含みます。",
+    "examples": ["システムの1ヶ所で発生したバグが、カスケード障害を引き起こしてサーバー全体がダウンした。"],
+    "synonyms": ["連鎖", "ドミノ倒し", "波及"]
+  },
+  {
+    "id": 2, "word": "かしずく（傅く）", "category": "古語・大和言葉", "fieldTag": "日常", "eraTag": "古語", "reading": "かしづく", "kanji": "傅く", "english": "",
+    "meaning": "人に仕えて 大事に世話をする。また、子供を大切に養い育てる。",
+    "background": "古語の「かしづく」に由来。平安時代の貴族社会において広く使われていました。",
+    "nuance": "相手に対して「深い敬意」や「愛情」を持って、至れり尽くせりでもてなすというニュアンスが含まれます。",
+    "examples": ["若き女王の周りには、彼女に傅く大勢の侍従たちが控えていた。"],
+    "synonyms": ["仕える（つかえる）", "お世話する"]
+  }
+];
+
+// アプリケーションデータと管理状態（JSONルート直下に組み込まれます）
+let wordData = [];
+let currentWordId = -1;
+let isNewWord = false;
+
+let appMetaData = {
+    version: VERSION_STR,
+    created_at: "", // 11桁の正確な yyユリウス通日hhmmss
+    updated_at: "",
+    history: []     // 変更ログ
+};
+
+let searchQuery = '';
+let currentSort = 'id';
+let currentHierarchy = 'category'; 
+let openCategories = {};
+
+// IndexedDB 用定数 (最後に開いたファイルハンドルの永続化に使用)
+const DB_NAME = 'NangoFileStore';
+const STORE_NAME = 'Handles';
+let lastFileHandle = null;
+
+// IndexedDB ユーティリティ
+function openIDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
+        };
+        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => reject(e.target.error);
+    });
+}
+async function saveFileHandle(handle) {
+    try {
+        const db = await openIDB();
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put(handle, 'last_opened');
+    } catch (e) { console.error("IDB保存失敗:", e); }
+}
+async function getFileHandle() {
+    try {
+        const db = await openIDB();
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const req = tx.objectStore(STORE_NAME).get('last_opened');
+        return new Promise((resolve) => req.onsuccess = () => resolve(req.result));
+    } catch (e) { return null; }
+}
+
+// 正確な11桁の「yyユリウス通日hhmmss」スタンプを生成
+function getJulianTimestamp() {
+    const now = new Date();
+    const yy = String(now.getFullYear()).slice(-2);
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now - start;
+    const oneDay = 1000 * 60 * 60 * 24;
+    const julianDay = Math.floor(diff / oneDay);
+    const jdd = String(julianDay).padStart(3, '0');
+    
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    
+    return `${yy}${jdd}${hh}${mm}${ss}`;
+}
+
+// 履歴の蓄積
+function addHistoryLog(action, detail = "") {
+    const ts = getJulianTimestamp();
+    appMetaData.updated_at = ts;
+    if (!appMetaData.history) appMetaData.history = [];
+    appMetaData.history.push({ timestamp: ts, action, detail });
+    if (appMetaData.history.length > 50) appMetaData.history.shift(); // 直近50件制限
+}
+
+// 1. 初期化処理
+async function initApp() {
+    const savedData = localStorage.getItem('nango_data_v2');
+    if (savedData) {
+        try {
+            const parsed = JSON.parse(savedData);
+            appMetaData.created_at = parsed.created_at || getJulianTimestamp();
+            appMetaData.updated_at = parsed.updated_at || appMetaData.created_at;
+            appMetaData.history = parsed.history || [];
+            wordData = parsed.words || [];
+            sanitizeData(wordData);
+        } catch(e) { loadDefaultState(); }
+    } else { loadDefaultState(); }
+    
+    if (wordData.length > 0) {
+        refreshOpenState();
+        currentWordId = wordData[0].id;
+    }
+
+    renderSidebarTree();
+    showViewMode();
+
+    // 💡 最後に開いたファイルハンドルがブラウザ内に記憶されているかチェック
+    await checkLastOpenedFile();
+}
+
+function loadDefaultState() {
+    wordData = JSON.parse(JSON.stringify(DEFAULT_WORDS));
+    sanitizeData(wordData);
+    appMetaData.created_at = getJulianTimestamp();
+    appMetaData.updated_at = appMetaData.created_at;
+    appMetaData.history = [{ timestamp: appMetaData.created_at, action: "created", detail: "システム初期データセット生成" }];
+    saveToLocalStorage();
+}
+
+function sanitizeData(dataArray) {
+    dataArray.forEach((item, index) => {
+        if (!item.id) item.id = Date.now() + index;
+        if (!item.category) item.category = "指定なし";
+        if (item.fieldTag === undefined) item.fieldTag = "";
+        if (item.eraTag === undefined) item.eraTag = "";
+        if (item.reading === undefined) item.reading = "";
+        if (item.kanji === undefined) item.kanji = "";
+        if (item.english === undefined) item.english = "";
+        if (!item.examples) item.examples = [];
+        if (!item.synonyms) item.synonyms = [];
+    });
+}
+
+function extractWordsData(importedObj) {
+    if (!importedObj) return [];
+    if (Array.isArray(importedObj)) return importedObj;
+    if (importedObj.words && Array.isArray(importedObj.words)) return importedObj.words;
+    return [];
+}
+
+function saveToLocalStorage() {
+    const payload = {
+        version: VERSION_STR,
+        created_at: appMetaData.created_at,
+        updated_at: appMetaData.updated_at,
+        history: appMetaData.history,
+        words: wordData
+    };
+    localStorage.setItem('nango_data_v2', JSON.stringify(payload));
+}
+
+// 💡 最後に開いたファイルを起動時に確認し通知バーを出す (File System Access APIが有効な場合)
+async function checkLastOpenedFile() {
+    if ('showOpenFilePicker' in window) {
+        lastFileHandle = await getFileHandle();
+        const noticeEl = document.getElementById('syncNotice');
+        if (lastFileHandle) {
+            noticeEl.style.display = 'flex';
+            noticeEl.innerHTML = `
+                <span>📌 前回同期したファイル: <strong>${lastFileHandle.name}</strong> が記憶されています。</span>
+                <button class="btn btn-sm" style="background:var(--sync-color); color:white; border:none; padding:5px 12px;" onclick="syncWithLastFile()">🔄 このファイルと同期（デフォルトロード）</button>
+            `;
+        } else {
+            noticeEl.style.display = 'none';
+        }
+    }
+}
+
+// 💡 記憶された「最後のファイル」から直接同期
+async function syncWithLastFile() {
+    if (!lastFileHandle) return;
+    try {
+        const options = { mode: 'readwrite' };
+        // ブラウザのセキュリティ仕様上、再開時の初回アクセス許可をユーザーに求めます
+        if (await lastFileHandle.queryPermission(options) !== 'granted') {
+            if (await lastFileHandle.requestPermission(options) !== 'granted') {
+                alert('ファイルへのアクセス許可が得られませんでした。');
+                return;
+            }
+        }
+        const file = await lastFileHandle.getFile();
+        const text = await file.text();
+        const imported = JSON.parse(text);
+        
+        const res = processImportedData(imported, file.name);
+        await saveFileHandle(lastFileHandle);
+        await checkLastOpenedFile();
+        
+        alert(`前回ファイル「${file.name}」とのデフォルト同期に成功しました！\n\n・更新: ${res.updateCount} 件\n・追加: ${res.addCount} 件`);
+    } catch (e) {
+        console.error(e);
+        alert('ファイルの自動同期に失敗しました。ファイルが削除または移動された可能性があります。');
+    }
+}
+
+// 💡 同期ボタン。モダン環境ならダイアログで複数選択、非対応ならinput[type=file]へ
+async function triggerSync() {
+    if (!('showOpenFilePicker' in window)) {
+        document.getElementById('syncFileInput').click();
+        return;
+    }
+    try {
+        const handles = await window.showOpenFilePicker({
+            multiple: true,
+            types: [{ description: 'JSON Files', accept: { 'application/json': ['.json'] } }]
+        });
+        if (handles.length === 0) return;
+
+        let latestData = null;
+        let latestHandle = null;
+        let maxUpdatedAt = '';
+
+        const escapedVer = VERSION_STR.replace(/\./g, '\\.');
+        const regex = new RegExp(`^Nango_[0-9]{11}_${escapedVer}(?:_export)?\\.json$`);
+
+        // 💡 選択された複数ファイルから、JSON内部の「updated_at」が最も新しいものを自動選別
+        for (const handle of handles) {
+            if (!regex.test(handle.name)) continue;
+            const file = await handle.getFile();
+            const text = await file.text();
+            try {
+                const parsed = JSON.parse(text);
+                const upAt = parsed.updated_at || parsed.created_at || '';
+                if (upAt > maxUpdatedAt) {
+                    maxUpdatedAt = upAt;
+                    latestData = parsed;
+                    latestHandle = handle;
+                }
+            } catch(err){}
+        }
+
+        if (!latestData) {
+            alert(`選択された群に、対応バージョン(${VERSION_STR})を満たす正しい規則の難語ファイルが見つかりませんでした。`);
+            return;
+        }
+
+        const res = processImportedData(latestData, latestHandle.name);
+        
+        // 💡 同期に成功したファイルを「最後に開いたファイル」として記憶に保存
+        await saveFileHandle(latestHandle);
+        await checkLastOpenedFile();
+
+        alert(`最も最新のファイル「${latestHandle.name}」を自動判別し同期しました！\n\n・更新: ${res.updateCount} 件\n・追加: ${res.addCount} 件`);
+    } catch(err) {
+        if (err.name !== 'AbortError') alert('同期中にエラーが発生しました。');
+    }
+}
+
+// 従来のinput[type=file]経由の同期 (SafariやFirefox、スマホ等用フォールバック)
+function syncWithSelectedFiles(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const escapedVer = VERSION_STR.replace(/\./g, '\\.');
+    const regex = new RegExp(`^Nango_[0-9]{11}_${escapedVer}(?:_export)?\\.json$`);
+    const promises = [];
+
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (!regex.test(file.name)) continue;
+        promises.push(new Promise(res => {
+            const r = new FileReader();
+            r.onload = (e) => { try { res({ name: file.name, data: JSON.parse(e.target.result) }); } catch(sz){ res(null); } };
+            r.readAsText(file);
+        }));
+    }
+
+    Promise.all(promises).then(results => {
+        const valids = results.filter(r => r !== null);
+        if (valids.length === 0) { alert('有効な難語ファイルがありませんでした。'); return; }
+        
+        let latest = null;
+        let maxUp = '';
+        // 💡 内部のupdated_atが最も最新のものを抽出
+        valids.forEach(r => {
+            const up = r.data.updated_at || r.data.created_at || '';
+            if (up > maxUp) { maxUp = up; latest = r; }
+        });
+
+        if (!latest) return;
+        const res = processImportedData(latest.data, latest.name);
+        alert(`最新データ「${latest.name}」を内部解析して同期しました！\n※ブラウザ環境の制限によりファイル接続の永続記憶はされません。`);
+    });
+    event.target.value = '';
+}
+
+// 共通インポート処理コア
+function processImportedData(imported, fileName) {
+    const externalArray = extractWordsData(imported);
+    if (externalArray.length === 0) throw new Error("有効な難語データ配列が含まれていません。");
+
+    // メタデータの継承
+    if (imported.created_at) appMetaData.created_at = imported.created_at;
+    if (imported.updated_at) appMetaData.updated_at = imported.updated_at;
+    if (imported.history) appMetaData.history = imported.history;
+
+    let updateCount = 0;
+    let addCount = 0;
+
+    externalArray.forEach((extItem, index) => {
+        if (!extItem.word || extItem.word.includes('※必須')) return;
+        const existing = wordData.find(w => w.word === extItem.word);
+        if (existing) {
+            Object.assign(existing, extItem, { id: existing.id });
+            updateCount++;
+        } else {
+            const newItem = { ...extItem };
+            if (!newItem.id) newItem.id = Date.now() + index;
+            wordData.push(newItem);
+            addCount++;
+        }
+    });
+
+    sanitizeData(wordData);
+    addHistoryLog("同期統合", `ファイル [${fileName}] から同期。追加:${addCount}件 / 更新:${updateCount}件`);
+    saveToLocalStorage();
+    refreshOpenState();
+    renderSidebarTree();
+    
+    if (currentWordId !== -1 && !wordData.some(w => w.id === currentWordId)) {
+        currentWordId = wordData.length > 0 ? wordData[0].id : -1;
+    }
+    showViewMode();
+    return { addCount, updateCount };
+}
+
+// 2. 検索・ソート・構造切り替え
+function handleSearch() {
+    searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+    renderSidebarTree();
+}
+function setSort(type) {
+    currentSort = type;
+    document.getElementById('sort-id').classList.toggle('active', type === 'id');
+    document.getElementById('sort-alpha').classList.toggle('active', type === 'alpha');
+    renderSidebarTree();
+}
+function setHierarchyStructure(structType) {
+    currentHierarchy = structType;
+    document.getElementById('struct-cat').classList.toggle('active', structType === 'category');
+    document.getElementById('struct-field').classList.toggle('active', structType === 'fieldTag');
+    document.getElementById('struct-era').classList.toggle('active', structType === 'eraTag');
+    refreshOpenState();
+    renderSidebarTree();
+}
+function refreshOpenState() {
+    openCategories = {};
+    wordData.forEach(w => { const key = w[currentHierarchy] || "(未設定)"; openCategories[key] = true; });
+}
+
+function getProcessedWords() {
+    let result = [...wordData];
+    if (searchQuery) {
+        result = result.filter(w => {
+            return (w.word && w.word.toLowerCase().includes(searchQuery)) ||
+                   (w.reading && w.reading.toLowerCase().includes(searchQuery)) ||
+                   (w.kanji && w.kanji.toLowerCase().includes(searchQuery)) ||
+                   (w.english && w.english.toLowerCase().includes(searchQuery)) ||
+                   (w.fieldTag && w.fieldTag.toLowerCase().includes(searchQuery)) ||
+                   (w.eraTag && w.eraTag.toLowerCase().includes(searchQuery)) ||
+                   (w.meaning && w.meaning.toLowerCase().includes(searchQuery)) ||
+                   (w.synonyms && w.synonyms.some(s => s.toLowerCase().includes(searchQuery)));
+        });
+    }
+    if (currentSort === 'alpha') {
+        result.sort((a, b) => (a.reading || a.word || '').localeCompare(b.reading || b.word || '', 'ja'));
+    } else {
+        result.sort((a, b) => (a.id || 0) - (b.id || 0));
+    }
+    return result;
+}
+
+// 3. サイドバーツリー描画
+function renderSidebarTree() {
+    const container = document.getElementById('treeContainer');
+    container.innerHTML = '';
+    const processedWords = getProcessedWords();
+    
+    if (processedWords.length === 0) {
+        container.innerHTML = '<div style="font-size:12px; color:var(--muted-color); text-align:center; padding:20px 0;">該当単語なし</div>';
+        return;
+    }
+
+    const categorized = {};
+    processedWords.forEach(word => {
+        const groupKey = word[currentHierarchy] ? word[currentHierarchy].trim() : "(未設定)";
+        if (!categorized[groupKey]) categorized[groupKey] = [];
+        categorized[groupKey].push(word);
+    });
+
+    Object.keys(categorized).sort().forEach(groupName => {
+        const words = categorized[groupName];
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = `tree-category ${openCategories[groupName] ? 'open' : ''}`;
+        
+        const header = document.createElement('div');
+        header.className = 'tree-category-header';
+        header.onclick = () => { categoryDiv.classList.toggle('open'); openCategories[groupName] = categoryDiv.classList.contains('open'); };
+
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'tree-category-title';
+        titleSpan.innerHTML = `<span class="tree-toggle-icon">▶</span> ${groupName} (${words.length})`;
+        header.appendChild(titleSpan);
+        categoryDiv.appendChild(header);
+
+        const wordListDiv = document.createElement('div');
+        wordListDiv.className = 'tree-word-list';
+
+        words.forEach(word => {
+            const wordBtn = document.createElement('button');
+            wordBtn.className = `tree-word-item ${word.id === currentWordId ? 'active' : ''}`;
+            wordBtn.textContent = word.word ? word.word.split('（')[0].split('(')[0] : '無題';
+            wordBtn.title = word.word;
+            wordBtn.onclick = () => {
+                currentWordId = word.id;
+                document.querySelectorAll('.tree-word-item').forEach(btn => btn.classList.remove('active'));
+                wordBtn.classList.add('active');
+                showViewMode();
+            };
+            wordListDiv.appendChild(wordBtn);
+        });
+        categoryDiv.appendChild(wordListDiv);
+        container.appendChild(categoryDiv);
+    });
+    document.getElementById('exportBtn').disabled = wordData.length === 0;
+}
+
+// 4. コンテンツ表示
+function showViewMode() {
+    document.getElementById('editMode').style.display = 'none';
+    document.getElementById('managePanelMode').style.display = 'none';
+    document.getElementById('viewMode').style.display = 'block';
+    
+    const target = document.getElementById('viewTarget');
+    const editBtn = document.getElementById('editBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const currentWord = wordData.find(w => w.id === currentWordId);
+
+    if (!currentWord || wordData.length === 0) {
+        target.innerHTML = '<div class="empty-message">表示する単語が選択されていないか、データが存在しません。</div>';
+        editBtn.style.display = 'none'; deleteBtn.style.display = 'none';
+        return;
+    }
+
+    editBtn.style.display = 'inline-block'; deleteBtn.style.display = 'inline-block';
+    const data = currentWord;
+    const examplesHtml = (data.examples || []).map(ex => `<li>${ex}</li>`).join('');
+    const synonymsHtml = (data.synonyms || []).map(syn => `<span class="synonym-tag">${syn}</span>`).join('');
+    const extraTags = [data.reading ? `よみがな: ${data.reading}` : '', data.kanji ? `漢字: ${data.kanji}` : '', data.english ? `スペル: ${data.english}` : ''].filter(Boolean).join(' | ');
+
+    let tagsHtml = '';
+    if (data.fieldTag) tagsHtml += `<span class="custom-tag tag-field">分野: ${data.fieldTag}</span>`;
+    if (data.eraTag) tagsHtml += `<span class="custom-tag tag-era">時代: ${data.eraTag}</span>`;
+
+    target.innerHTML = `
+        <div class="word-header-container">
+            <div class="word-title-row">
+                <h2 class="word-title">${data.word || ''}</h2>
+                <span class="category-badge">${data.category || '指定なし'}</span>
+            </div>
+            ${tagsHtml ? `<div class="tag-container">${tagsHtml}</div>` : ''}
+            ${extraTags ? `<div class="word-sub-info">${extraTags}</div>` : ''}
+        </div>
+        <div class="section-title">意味</div><div class="meaning-box">${data.meaning || ''}</div>
+        <div class="section-title">言葉の背景 / 由来</div><div class="text-content">${data.background || ''}</div>
+        <div class="section-title">ニュアンス</div><div class="text-content">${data.nuance || ''}</div>
+        <div class="section-title">例文</div><ul class="example-list">${examplesHtml || '<li>（登録なし）</li>'}</ul>
+        <div class="section-title">類義語</div><div class="synonym-container">${synonymsHtml || '（登録なし）'}</div>
+    `;
+}
+
+// 5. 単語の編集・追加
+function showEditForm() {
+    isNewWord = false;
+    document.getElementById('formTitle').textContent = "単語の編集";
+    document.getElementById('viewMode').style.display = 'none';
+    document.getElementById('managePanelMode').style.display = 'none';
+    document.getElementById('editMode').style.display = 'block';
+
+    const data = wordData.find(w => w.id === currentWordId);
+    document.getElementById('editWord').value = data.word || '';
+    document.getElementById('editCategory').value = data.category || '指定なし';
+    document.getElementById('editFieldTag').value = data.fieldTag || '';
+    document.getElementById('editEraTag').value = data.eraTag || '';
+    document.getElementById('editReading').value = data.reading || '';
+    document.getElementById('editKanji').value = data.kanji || '';
+    document.getElementById('editEnglish').value = data.english || '';
+    document.getElementById('editMeaning').value = data.meaning || '';
+    document.getElementById('editBackground').value = data.background || '';
+    document.getElementById('editNuance').value = data.nuance || '';
+    document.getElementById('editExamples').value = (data.examples || []).join('\n');
+    document.getElementById('editSynonyms').value = (data.synonyms || []).join(', ');
+}
+
+function showNewForm() {
+    isNewWord = true;
+    document.getElementById('formTitle').textContent = "新規単語追加";
+    document.getElementById('viewMode').style.display = 'none';
+    document.getElementById('managePanelMode').style.display = 'none';
+    document.getElementById('editMode').style.display = 'block';
+    // クリア
+    document.getElementById('editWord').value = ''; document.getElementById('editCategory').value = '指定なし';
+    document.getElementById('editFieldTag').value = ''; document.getElementById('editEraTag').value = '';
+    document.getElementById('editReading').value = ''; document.getElementById('editKanji').value = ''; document.getElementById('editEnglish').value = '';
+    document.getElementById('editMeaning').value = ''; document.getElementById('editBackground').value = ''; document.getElementById('editNuance').value = '';
+    document.getElementById('editExamples').value = ''; document.getElementById('editSynonyms').value = '';
+}
+function cancelEdit() { showViewMode(); }
+
+function saveWord() {
+    const word = document.getElementById('editWord').value.trim();
+    if (!word) { alert('単語表記は必須です。'); return; }
+
+    const examples = document.getElementById('editExamples').value.split('\n').map(l => l.trim()).filter(Boolean);
+    const synonyms = document.getElementById('editSynonyms').value.split(/[,，、\n]/).map(i => i.trim()).filter(Boolean);
+    const category = document.getElementById('editCategory').value;
+    const fieldTag = document.getElementById('editFieldTag').value.trim();
+    const eraTag = document.getElementById('editEraTag').value.trim();
+
+    if (isNewWord) {
+        const newId = Date.now();
+        wordData.push({
+            id: newId, word, category, fieldTag, eraTag,
+            reading: document.getElementById('editReading').value.trim(),
+            kanji: document.getElementById('editKanji').value.trim(),
+            english: document.getElementById('editEnglish').value.trim(),
+            meaning: document.getElementById('editMeaning').value.trim(),
+            background: document.getElementById('editBackground').value.trim(),
+            nuance: document.getElementById('editNuance').value.trim(),
+            examples, synonyms
+        });
+        currentWordId = newId;
+        addHistoryLog("単語追加", `「${word}」を新規登録しました。`);
+    } else {
+        const target = wordData.find(w => w.id === currentWordId);
+        Object.assign(target, {
+            word, category, fieldTag, eraTag,
+            reading: document.getElementById('editReading').value.trim(),
+            kanji: document.getElementById('editKanji').value.trim(),
+            english: document.getElementById('editEnglish').value.trim(),
+            meaning: document.getElementById('editMeaning').value.trim(),
+            background: document.getElementById('editBackground').value.trim(),
+            nuance: document.getElementById('editNuance').value.trim(),
+            examples, synonyms
+        });
+        addHistoryLog("単語編集", `「${word}」の記述情報を更新しました。`);
+    }
+
+    saveToLocalStorage();
+    refreshOpenState();
+    renderSidebarTree();
+    showViewMode();
+}
+
+function deleteCurrentWord() {
+    if (currentWordId === -1) return;
+    const target = wordData.find(w => w.id === currentWordId);
+    if (!confirm(`「${target.word}」を削除してもよろしいですか？`)) return;
+
+    addHistoryLog("単語削除", `「${target.word}」を削除しました。`);
+    const processed = getProcessedWords();
+    const idx = processed.findIndex(w => w.id === currentWordId);
+    
+    wordData = wordData.filter(w => w.id !== currentWordId);
+    const nextList = getProcessedWords();
+    if (nextList.length === 0) currentWordId = -1;
+    else if (idx >= nextList.length) currentWordId = nextList[nextList.length - 1].id;
+    else currentWordId = nextList[idx].id;
+
+    saveToLocalStorage();
+    renderSidebarTree();
+    showViewMode();
+}
+
+// 6. 管理＆内蔵履歴パネル
+function showManagePanel() {
+    document.getElementById('viewMode').style.display = 'none';
+    document.getElementById('editMode').style.display = 'none';
+    document.getElementById('managePanelMode').style.display = 'block';
+
+    renderTagTables();
+    renderHistoryLog();
+}
+function closeManagePanel() { showViewMode(); }
+
+function renderTagTables() {
+    const fMap = {}, eMap = {};
+    wordData.forEach(w => { if (w.fieldTag) fMap[w.fieldTag] = (fMap[w.fieldTag] || 0) + 1; if (w.eraTag) eMap[w.eraTag] = (eMap[w.eraTag] || 0) + 1; });
+
+    let fHtml = `<table class="tag-table"><thead><tr><th>タグ名</th><th>該当数</th><th>操作</th></tr></thead><tbody>`;
+    const fKeys = Object.keys(fMap).sort();
+    if(!fKeys.length) fHtml += `<tr><td colspan="3" style="text-align:center;color:var(--muted-color);">登録なし</td></tr>`;
+    else fKeys.forEach(t => { fHtml += `<tr><td><span class="custom-tag tag-field">${t}</span></td><td>${fMap[t]}件</td><td><button class="btn-sm" style="background:#f39c12;color:white;border:none;" onclick="renameTag('fieldTag', '${t}')">一括変更</button></td></tr>`; });
+    document.getElementById('fieldTagsTableContainer').innerHTML = fHtml + `</tbody></table>`;
+
+    let eHtml = `<table class="tag-table"><thead><tr><th>タグ名</th><th>該当数</th><th>操作</th></tr></thead><tbody>`;
+    const eKeys = Object.keys(eMap).sort();
+    if(!eKeys.length) eHtml += `<tr><td colspan="3" style="text-align:center;color:var(--muted-color);">登録なし</td></tr>`;
+    else eKeys.forEach(t => { eHtml += `<tr><td><span class="custom-tag tag-era">${t}</span></td><td>${eMap[t]}件</td><td><button class="btn-sm" style="background:#f39c12;color:white;border:none;" onclick="renameTag('eraTag', '${t}')">一括変更</button></td></tr>`; });
+    document.getElementById('eraTagsTableContainer').innerHTML = eHtml + `</tbody></table>`;
+}
+
+function renameTag(type, oldName) {
+    const label = type === 'fieldTag' ? '分野タグ' : '時代タグ';
+    const newName = prompt(`「${oldName}」の新しい名称を入力（空欄でタグ削除）:`, oldName);
+    if (newName === null) return;
+    
+    const trimName = newName.trim();
+    let c = 0;
+    wordData.forEach(w => { if (w[type] === oldName) { w[type] = trimName; c++; } });
+
+    addHistoryLog("タグ一括変更", `${label} 「${oldName}」 から 「${trimName || '(削除)'}」 へ変更 (${c}件)`);
+    saveToLocalStorage();
+    refreshOpenState();
+    renderSidebarTree();
+    renderTagTables();
+}
+
+// 💡 JSONに内蔵された履歴データを新しい順に一覧描画
+function renderHistoryLog() {
+    const box = document.getElementById('historyLogContainer');
+    if (!appMetaData.history || appMetaData.history.length === 0) {
+        box.innerHTML = '<span style="color:var(--muted-color);">履歴データはありません。</span>';
+        return;
+    }
+    const html = appMetaData.history.map(h => {
+        return `<div style="margin-bottom: 4px; border-bottom: 1px dotted var(--border-color); padding-bottom: 2px;">
+            <span style="color:var(--accent-color); font-weight:bold;">[${h.timestamp}]</span>
+            <span style="background:#e2e8f0; padding:1px 5px; border-radius:3px; font-weight:bold;">${h.action}</span>
+            <span style="margin-left:5px; color:#4a5568;">${h.detail || ''}</span>
+        </div>`;
+    }).reverse().join('');
+    box.innerHTML = html;
+}
+
+// 7. インポート、エクスポート、テンプレート出力
+function triggerImport() { document.getElementById('fileInput').click(); }
+
+function importJSON(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const promises = Array.from(files).map(file => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => { try { resolve(JSON.parse(e.target.result)); } catch(err){ reject(new Error(`${file.name}が正しくない形式です。`)); } };
+            reader.readAsText(file);
+        });
+    });
+
+    Promise.all(promises).then(results => {
+        let combined = [];
+        results.forEach(r => { combined = combined.concat(extractWordsData(r)); });
+        combined = combined.filter(w => w && w.word && !w.word.includes('※必須'));
+
+        if(combined.length === 0) { alert('インポートできる有効な単語データが見つかりませんでした。'); return; }
+        sanitizeData(combined);
+
+        if (confirm(`合計 ${combined.length} 件の単語データを読み込みました。\n現在のデータに追加しますか？ (キャンセルで全上書き)`)) {
+            wordData = wordData.concat(combined);
+            addHistoryLog("インポート追加", `${files.length}個の外部ファイルからデータを追記統合`);
+        } else {
+            wordData = combined;
+            if (results[0] && results[0].created_at) {
+                appMetaData.created_at = results[0].created_at;
+                appMetaData.history = results[0].history || [];
+            } else {
+                appMetaData.created_at = getJulianTimestamp();
+                appMetaData.history = [];
+            }
+            addHistoryLog("インポート上書き", `${files.length}個のファイル構造で全データを上書き配置`);
+        }
+
+        currentWordId = wordData.length > 0 ? wordData[0].id : -1;
+        saveToLocalStorage();
+        refreshOpenState();
+        renderSidebarTree();
+        showViewMode();
+        alert('インポート処理が正常に完了しました。');
+    }).catch(e => alert(e.message));
+    event.target.value = '';
+}
+
+// 💡 末尾に必ず「_export」を付与したファイル名（作成日時基準）で書き出し
+function exportJSON() {
+    if (wordData.length === 0) return;
+    if (!appMetaData.created_at) appMetaData.created_at = getJulianTimestamp();
+    
+    addHistoryLog("エクスポート", "JSON外部保存ファイルを出力");
+    saveToLocalStorage();
+
+    const exportObj = {
+        version: VERSION_STR,
+        created_at: appMetaData.created_at,
+        updated_at: appMetaData.updated_at,
+        history: appMetaData.history,
+        words: wordData
+    };
+
+    const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    
+    // Nango_作成日時_vMM.PP_export.json
+    a.href = url; 
+    a.download = `Nango_${appMetaData.created_at}_${VERSION_STR}_export.json`;
+    
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// 💡 テンプレート出力時に、現在蓄積されている「タグ一覧」を候補（配列）としてセット
+function exportTemplateJSON() {
+    const fTags = [...new Set(wordData.map(w => w.fieldTag).filter(Boolean))].sort();
+    const eTags = [...new Set(wordData.map(w => w.eraTag).filter(Boolean))].sort();
+
+    const template = {
+        version: VERSION_STR,
+        tag_candidates: {
+            fieldTags: fTags,
+            eraTags: eTags
+        },
+        words: [
+            {
+                word: "新規追加単語の名称 ※必須", category: "指定なし",
+                fieldTag: fTags.length > 0 ? fTags[0] : "分野", eraTag: eTags.length > 0 ? eTags[0] : "時代",
+                reading: "", kanji: "", english: "", meaning: "", background: "", nuance: "", examples: [], synonyms: []
+            }
+        ]
+    };
+    
+    const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `NANGOtemplate_${VERSION_STR}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function resetToDefault() {
+    if (!confirm('データを初期化しますか？記憶されていた編集履歴やファイル接続もリセットされます。')) return;
+    localStorage.removeItem('nango_data_v2');
+    if ('indexedDB' in window) indexedDB.deleteDatabase(DB_NAME);
+    loadDefaultState();
+    location.reload();
+}
+
+// システム起動
+initApp();
+</script>
+
+</body>
+</html>

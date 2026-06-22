@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=index">
+    <title>難語ビューアー</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --muted-color: #7f8c8d;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        /* セレクター（切り替え部分） */
+        .selector-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .word-btn {
+            background-color: var(--card-bg);
+            border: 1px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .word-btn:hover {
+            background-color: #eee;
+        }
+
+        .word-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* メインカード */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .word-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-top: 25px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: "◆";
+            margin-right: 6px;
+            font-size: 12px;
+        }
+
+        .meaning-box {
+            background-color: #eef7fc;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .text-content {
+            font-size: 15px;
+            color: #444;
+            text-align: justify;
+        }
+
+        /* 例文リスト */
+        .example-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .example-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .example-list li::before {
+            content: "「";
+            position: absolute;
+            left: 0;
+            color: var(--muted-color);
+        }
+        .example-list li::after {
+            content: "」";
+            color: var(--muted-color);
+        }
+
+        /* 類義語タグ */
+        .synonym-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .synonym-tag {
+            background-color: #f1f3f5;
+            color: #495057;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>難語データビューアー</h1>
+    </header>
+
+    <div class="selector-container" id="selectorContainer"></div>
+
+    <div class="card" id="wordCard">
+        </div>
+</div>
+
+<script>
+// アップロードされたJSONデータ
+const wordData = [
+  {
+    "word": "カスケード（cascade）",
+    "meaning": "連鎖的に物事が起きること。または、上から下へ階段状に流れ落ちる滝や、そのように連なるものを指す。",
+    "background": "原語はイタリア語の「cascata（滝）」やラテン語の「cadere（落ちる）」に由来し、元々は「小さな連なった滝」を意味していました。そこから派生して、現代ではIT、ビジネス、科学など様々な分野で「一つの事象が次の事象を芋づる式に引き起こす仕組みや現象」を指す言葉として広く使われています。",
+    "nuance": "単に物事が連続するだけでなく、「上流から下流へ」「1つが引き金となって次々と自動的・不可避的に」伝播していくという、力強い連鎖のニュアンスを含みます。IT分野では機能の連鎖、ビジネスでは方針の浸透、医療では拒絶反応の連鎖など、文脈によってポジティブにもネガティブにも使われます。",
+    "examples": [
+      "経営陣が決定した経営戦略を、各部門へカスケードダウン（一貫して浸透）させる。",
+      "システムの1ヶ所で発生したバグが、カスケード障害を引き起こしてサーバー全体がダウンした。",
+      "CSS（Cascading Style Sheets）は、スタイルの優先順位が上から下へと連鎖的に適用される仕組みに基づいている。"
+    ],
+    "synonyms": [
+      "連鎖",
+      "ドミノ倒し",
+      "波及",
+      "芋づる式",
+      "数珠繋ぎ"
+    ]
+  },
+  {
+    "word": "かしずく（傅く）",
+    "meaning": "人に仕えて 大事に世話をする。また、子供を大切に養い育てる。",
+    "background": "古語の「かしづく」に由来する言葉です。平安時代の貴族社会において、身分の高い人に仕えて身の回りの世話をすることや、親が大切な我が子をいつくしみ、手を尽くして育てることを指す言葉として広く使われていました。現代では主に前者の「仕える」という意味合いが強く残っています。",
+    "nuance": "単にお世話をするだけでなく、相手に対して「深い敬意」や「愛情」を持って、至れり尽くせりでもてなすというニュアンスが含まれます。現代の日常会話で使われることは稀で、小説や漫画などの創作物、あるいは格式高い表現の中で、主従関係や献身的な態度を強調する際によく用いられます。",
+    "examples": [
+      "若き女王の周りには、彼女に傅く大勢の侍従たちが控えていた。",
+      "主人の一言で、使用人たちは一斉に傅いて命令に従った。",
+      "両親から蝶よ花よと傅かれて育ったため、彼女は世間知らずなところがある。"
+    ],
+    "synonyms": [
+      "仕える（つかえる）",
+      "かしずき奉る",
+      "お世話する",
+      "奉公する",
+      "傅育する（ふいくする）"
+    ]
+  }
+];
+
+const selectorContainer = document.getElementById('selectorContainer');
+const wordCard = document.getElementById('wordCard');
+
+// ビューアーの初期化
+function initViewer() {
+    // 選択ボタンを動的に生成
+    wordData.forEach((data, index) => {
+        const button = document.createElement('button');
+        button.className = `word-btn ${index === 0 ? 'active' : ''}`;
+        button.textContent = data.word.split('（')[0]; // ボタン文字はシンプルに
+        button.addEventListener('click', () => {
+            // アクティブクラスの切り替え
+            document.querySelectorAll('.word-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            // データの表示
+            renderWord(index);
+        });
+        selectorContainer.appendChild(button);
+    });
+
+    // 最初の単語を表示
+    renderWord(0);
+}
+
+// 指定されたインデックスの単語を表示する関数
+function renderWord(index) {
+    const data = wordData[index];
+    
+    // 例文のリスト項目を作成
+    const examplesHtml = data.examples.map(ex => `<li>${ex}</li>`).join('');
+    
+    // 類義語のタグを作成
+    const synonymsHtml = data.synonyms.map(syn => `<span class="synonym-tag">${syn}</span>`).join('');
+
+    // カードのHTMLを組み立て
+    wordCard.innerHTML = `
+        <h2 class="word-title">${data.word}</h2>
+        
+        <div class="section-title">意味</div>
+        <div class="meaning-box">${data.meaning}</div>
+        
+        <div class="section-title">言葉の背景 / 由来</div>
+        <div class="text-content">${data.background}</div>
+        
+        <div class="section-title">ニュアンス</div>
+        <div class="text-content">${data.nuance}</div>
+        
+        <div class="section-title">例文</div>
+        <ul class="example-list">${examplesHtml}</ul>
+        
+        <div class="section-title">類義語</div>
+        <div class="synonym-container">${synonymsHtml}</div>
+    `;
+}
+
+// 起動
+initViewer();
+</script>
+
+</body>
+</html>

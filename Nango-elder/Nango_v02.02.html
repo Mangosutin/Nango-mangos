@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高度な難語データビューアー Pro</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --muted-color: #7f8c8d;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f1c40f;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+
+        /* ツールバー（インポート・エクスポートなど） */
+        .toolbar {
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* コントロールバー（ソート・フィルター） */
+        .control-bar {
+            background: #edf2f7;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 14px;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .control-label {
+            font-weight: bold;
+            color: var(--primary-color);
+            min-width: 80px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .btn-primary { background: var(--accent-color); color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-success { background: var(--success-color); color: white; }
+        .btn-success:hover { background: #27ae60; }
+        .btn-danger { background: var(--danger-color); color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-secondary { background: #95a5a6; color: white; }
+        .btn-secondary:hover { background: #7f8c8d; }
+        
+        /* トグル用小ボタン（ソート・フィルター用） */
+        .btn-sm {
+            padding: 4px 12px;
+            border-radius: 15px;
+            background: white;
+            border: 1px solid #cbd5e0;
+            color: #4a5568;
+            font-size: 13px;
+        }
+        .btn-sm:hover { background: #f7fafc; }
+        .btn-sm.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        #fileInput { display: none; }
+
+        /* セレクター（切り替え部分） */
+        .selector-container {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .word-btn {
+            background-color: var(--card-bg);
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .word-btn:hover { background-color: #eee; }
+        .word-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        /* メインエリア（ビュー・編集） */
+        .main-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 30px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .word-header-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .word-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        /* 分類バッジ */
+        .category-badge {
+            background-color: #e2e8f0;
+            color: #4a5568;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-top: 25px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title::before {
+            content: "◆";
+            margin-right: 6px;
+            font-size: 12px;
+        }
+
+        .meaning-box {
+            background-color: #eef7fc;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .text-content {
+            font-size: 15px;
+            color: #444;
+            text-align: justify;
+            white-space: pre-wrap;
+        }
+
+        .example-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        .example-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        .example-list li::before { content: "「"; position: absolute; left: 0; color: var(--muted-color); }
+        .example-list li::after { content: "」"; color: var(--muted-color); }
+
+        .synonym-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+        .synonym-tag { background-color: #f1f3f5; color: #495057; padding: 4px 12px; border-radius: 15px; font-size: 14px; }
+
+        /* 編集フォームスタイル */
+        .edit-form { display: none; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: var(--primary-color); }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 15px;
+            font-family: inherit;
+        }
+        textarea.form-control { resize: vertical; min-height: 80px; }
+        .form-actions { display: flex; gap: 10px; margin-top: 20px; }
+
+        /* 空の状態 */
+        .empty-message { text-align: center; color: var(--muted-color); padding: 4px 0; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>難語データビューアー Pro</h1>
+    </header>
+
+    <div class="toolbar">
+        <div>
+            <button class="btn btn-primary" onclick="triggerImport()">JSONインポート</button>
+            <input type="file" id="fileInput" accept=".json" onchange="importJSON(event)" multiple>
+            <button class="btn btn-success" id="exportBtn" onclick="exportJSON()">JSONエクスポート</button>
+        </div>
+        <div>
+            <button class="btn btn-primary" onclick="showNewForm()">＋ 新規単語追加</button>
+            <button class="btn btn-danger" onclick="resetToDefault()">初期状態にリセット</button>
+        </div>
+    </div>
+
+    <div class="control-bar">
+        <div class="control-group">
+            <span class="control-label">並び替え:</span>
+            <button class="btn btn-sm active" id="sort-id" onclick="setSort('id')">登録順</button>
+            <button class="btn btn-sm" id="sort-alpha" onclick="setSort('alpha')">五十音順</button>
+        </div>
+        <div class="control-group">
+            <span class="control-label">分類で絞り込み:</span>
+            <div id="filterContainer" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                </div>
+        </div>
+    </div>
+
+    <div class="selector-container" id="selectorContainer"></div>
+
+    <div class="main-content">
+        <div id="viewMode">
+            <div style="float: right;">
+                <button class="btn btn-secondary" id="editBtn" onclick="showEditForm()">この単語を編集</button>
+                <button class="btn btn-danger" id="deleteBtn" style="padding: 8px 12px;" onclick="deleteCurrentWord()">削除</button>
+            </div>
+            <div id="viewTarget"></div>
+        </div>
+
+        <div id="editMode" class="edit-form">
+            <h2 id="formTitle" style="margin-top:0; color: var(--primary-color);">単語の編集</h2>
+            <div class="form-group">
+                <label for="editWord">単語（表記）</label>
+                <input type="text" id="editWord" class="form-control" placeholder="例: カスケード（cascade）">
+            </div>
+            <div class="form-group">
+                <label for="editCategory">単語分類</label>
+                <select id="editCategory" class="form-control">
+                    <option value="指定なし">指定なし</option>
+                    <option value="外来語">外来語</option>
+                    <option value="熟語">熟語</option>
+                    <option value="慣用句">慣用句</option>
+                    <option value="古語・大和言葉">古語・大和言葉</option>
+                    <option value="その他">その他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="editMeaning">意味</label>
+                <textarea id="editMeaning" class="form-control" placeholder="言葉の意味を入力"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editBackground">背景 / 由来</label>
+                <textarea id="editBackground" class="form-control" placeholder="言葉の背景や歴史、由来を入力"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editNuance">ニュアンス</label>
+                <textarea id="editNuance" class="form-control" placeholder="使われる際の細かいニュアンスを入力"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editExamples">例文（1行に1文ずつ入力してください）</label>
+                <textarea id="editExamples" class="form-control" style="min-height: 100px;" placeholder="例文1&#10;例文2&#10;例文3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editSynonyms">類義語（カンマ「,」区切り、または改行で入力してください）</label>
+                <textarea id="editSynonyms" class="form-control" placeholder="連鎖, 波及, ドミノ倒し"></textarea>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-success" onclick="saveWord()">保存</button>
+                <button class="btn btn-secondary" onclick="cancelEdit()">キャンセル</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// デフォルトの初期データ（categoryフィールドを追加）
+const defaultData = [
+  {
+    "id": 1,
+    "word": "カスケード（cascade）",
+    "category": "外来語",
+    "meaning": "連鎖的に物事が起きること。または、上から下へ階段状に流れ落ちる滝や、そのように連なるものを指す。",
+    "background": "原語はイタリア語の「cascata（滝）」やラテン語の「cadere（落ちる）」に由来し、元々は「小さな連なった滝」を意味していました。そこから派生して、現代ではIT、ビジネス、科学など様々な分野で「一つの事象が次の事象を芋づる式に引き起こす仕組みや現象」を指す言葉として広く使われています。",
+    "nuance": "単に物事が連続するだけでなく、「上流から下流へ」「1つが引き金となって次々と自動的・不可避的に」伝播していくという、力強い連鎖のニュアンスを含みます。IT分野では機能の連鎖、ビジネスでは方針の浸透、医療では拒絶反応の連鎖など、文脈によってポジティブにもネガティブにも使われます。",
+    "examples": [
+      "経営陣が決定した経営戦略を、各部門へカスケードダウン（一貫して浸透）させる。",
+      "システムの1ヶ所で発生したバグが、カスケード障害を引き起こしてサーバー全体がダウンした。",
+      "CSS（Cascading Style Sheets）は、スタイルの優先順位が上から下へと連鎖的に適用される仕組みに基づいている。"
+    ],
+    "synonyms": ["連鎖", "ドミノ倒し", "波及", "芋づる式", "数珠繋ぎ"]
+  },
+  {
+    "id": 2,
+    "word": "かしずく（傅く）",
+    "category": "古語・大和言葉",
+    "meaning": "人に仕えて 大事に世話をする。また、子供を大切に養い育てる。",
+    "background": "古語の「かしづく」に由来する言葉です。平安時代の貴族社会において、身分の高い人に仕えて身の回りの世話をすることや、親が大切な我が子をいつくしみ、手を尽くして育てることを指す言葉として広く使われていました。現代では主に前者の「仕える」という意味合いが強く残っています。",
+    "nuance": "単にお世話をするだけでなく、相手に対して「深い敬意」や「愛情」を持って、至れり尽くせりでもてなすというニュアンスが含まれます。現代の日常会話で使われることは稀で、小説や漫画などの創作物、あるいは格式高い表現の中で、主従関係や献身的な態度を強調する際によく用いられます。",
+    "examples": [
+      "若き女王の周りには、彼女に傅く大勢の侍従たちが控えていた。",
+      "主人の一言で、使用人たちは一斉に傅いて命令に従った。",
+      "両親から蝶よ花よと傅かれて育ったため、彼女は世間知らずなところがある。"
+    ],
+    "synonyms": ["仕える（つかえる）", "かしずき奉る", "お世話する", "奉公する", "傅育する（ふいくする）"]
+  }
+];
+
+// 内部状態
+let wordData = [];
+let currentWordId = -1; // インデックスではなく、一意のIDで管理することでソート・フィルタの影響を防ぐ
+let isNewWord = false;
+
+// ソート・フィルター状態
+let currentSort = 'id'; // 'id' または 'alpha'
+let currentFilter = 'ALL'; // 'ALL' または 各カテゴリ名
+
+// 1. 初期化処理
+function initApp() {
+    const savedData = localStorage.getItem('nango_data');
+    if (savedData) {
+        try {
+            wordData = JSON.parse(savedData);
+            // 互換性担保: 古いデータにIDやカテゴリがない場合は補完
+            wordData.forEach((item, index) => {
+                if (!item.id) item.id = Date.now() + index;
+                if (!item.category) item.category = "指定なし";
+            });
+        } catch(e) {
+            wordData = JSON.parse(JSON.stringify(defaultData));
+        }
+    } else {
+        wordData = JSON.parse(JSON.stringify(defaultData));
+        saveToLocalStorage();
+    }
+    
+    currentWordId = wordData.length > 0 ? wordData[0].id : -1;
+    updateFiltersDisplay();
+    renderSelector();
+    showViewMode();
+}
+
+function saveToLocalStorage() {
+    localStorage.setItem('nango_data', JSON.stringify(wordData));
+}
+
+// 2. ソート & フィルターロジック
+function setSort(type) {
+    currentSort = type;
+    document.getElementById('sort-id').classList.toggle('active', type === 'id');
+    document.getElementById('sort-alpha').classList.toggle('active', type === 'alpha');
+    renderSelector();
+}
+
+function setFilter(category) {
+    currentFilter = category;
+    updateFiltersDisplay();
+    
+    // フィルターを切り替えた際、現在選ばれている単語が表示対象外になった場合は先頭の単語を選択
+    const displayedWords = getProcessedWords();
+    if (displayedWords.length > 0) {
+        const isStillVisible = displayedWords.some(w => w.id === currentWordId);
+        if (!isStillVisible) {
+            currentWordId = displayedWords[0].id;
+        }
+    } else {
+        currentWordId = -1;
+    }
+    
+    renderSelector();
+    showViewMode();
+}
+
+// データ処理（フィルター → ソート）
+function getProcessedWords() {
+    // 1. フィルター適用
+    let result = [...wordData];
+    if (currentFilter !== 'ALL') {
+        result = result.filter(w => w.category === currentFilter);
+    }
+    
+    // 2. ソート適用
+    if (currentSort === 'alpha') {
+        result.sort((a, b) => (a.word || '').localeCompare(b.word || '', 'ja'));
+    } else {
+        result.sort((a, b) => (a.id || 0) - (b.id || 0));
+    }
+    
+    return result;
+}
+
+// フィルターボタン群の動的生成
+function updateFiltersDisplay() {
+    const container = document.getElementById('filterContainer');
+    container.innerHTML = '';
+    
+    // 定義されている基本カテゴリー + 現在データに存在する独自のカテゴリー
+    const baseCategories = ['ALL', '指定なし', '外来語', '熟語', '慣用句', '古語・大和言葉', 'その他'];
+    const activeCategoriesInData = [...new Set(wordData.map(w => w.category).filter(Boolean))];
+    const allCategories = [...new Set([...baseCategories, ...activeCategoriesInData])];
+    
+    allCategories.forEach(cat => {
+        // 各カテゴリの該当件数を計算
+        let count = 0;
+        if (cat === 'ALL') {
+            count = wordData.length;
+        } else {
+            count = wordData.filter(w => w.category === cat).length;
+        }
+        
+        // 0件のカテゴリはALL以外非表示にする（ただし選択中の場合は残す）
+        if (count === 0 && cat !== 'ALL' && currentFilter !== cat) return;
+
+        const btn = document.createElement('button');
+        btn.className = `btn-sm ${currentFilter === cat ? 'active' : ''}`;
+        btn.textContent = cat === 'ALL' ? `すべて (${count})` : `${cat} (${count})`;
+        btn.onclick = () => setFilter(cat);
+        container.appendChild(btn);
+    });
+}
+
+// 3. 描画処理
+function renderSelector() {
+    const container = document.getElementById('selectorContainer');
+    container.innerHTML = '';
+    
+    const displayedWords = getProcessedWords();
+    
+    displayedWords.forEach((data) => {
+        const button = document.createElement('button');
+        button.className = `word-btn ${data.id === currentWordId ? 'active' : ''}`;
+        button.textContent = data.word ? data.word.split('（')[0].split('(')[0] : '無題'; 
+        button.addEventListener('click', () => {
+            currentWordId = data.id;
+            document.querySelectorAll('.word-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            showViewMode();
+        });
+        container.appendChild(button);
+    });
+
+    document.getElementById('exportBtn').disabled = wordData.length === 0;
+}
+
+function showViewMode() {
+    document.getElementById('editMode').style.display = 'none';
+    document.getElementById('viewMode').style.display = 'block';
+    
+    const target = document.getElementById('viewTarget');
+    const editBtn = document.getElementById('editBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+
+    const currentWord = wordData.find(w => w.id === currentWordId);
+
+    if (!currentWord || wordData.length === 0) {
+        target.innerHTML = '<div class="empty-message">表示できるデータがありません。条件を変えるか、「新規単語追加」を行ってください。</div>';
+        editBtn.style.display = 'none';
+        deleteBtn.style.display = 'none';
+        return;
+    }
+
+    editBtn.style.display = 'inline-block';
+    deleteBtn.style.display = 'inline-block';
+
+    const data = currentWord;
+    const examplesHtml = (data.examples || []).map(ex => `<li>${ex}</li>`).join('');
+    const synonymsHtml = (data.synonyms || []).map(syn => `<span class="synonym-tag">${syn}</span>`).join('');
+
+    target.innerHTML = `
+        <div class="word-header-container">
+            <h2 class="word-title">${data.word || ''}</h2>
+            <span class="category-badge">${data.category || '指定なし'}</span>
+        </div>
+        
+        <div class="section-title">意味</div>
+        <div class="meaning-box">${data.meaning || ''}</div>
+        
+        <div class="section-title">言葉の背景 / 由来</div>
+        <div class="text-content">${data.background || ''}</div>
+        
+        <div class="section-title">ニュアンス</div>
+        <div class="text-content">${data.nuance || ''}</div>
+        
+        <div class="section-title">例文</div>
+        <ul class="example-list">${examplesHtml || '<li>（登録なし）</li>'}</ul>
+        
+        <div class="section-title">類義語</div>
+        <div class="synonym-container">${synonymsHtml || '<span style="color:var(--muted-color); font-size:14px;">（登録なし）</span>'}</div>
+    `;
+}
+
+// 4. 編集・新規追加機能
+function showEditForm() {
+    isNewWord = false;
+    document.getElementById('formTitle').textContent = "単語の編集";
+    document.getElementById('viewMode').style.display = 'none';
+    document.getElementById('editMode').style.display = 'block';
+
+    const data = wordData.find(w => w.id === currentWordId);
+    document.getElementById('editWord').value = data.word || '';
+    document.getElementById('editCategory').value = data.category || '指定なし';
+    document.getElementById('editMeaning').value = data.meaning || '';
+    document.getElementById('editBackground').value = data.background || '';
+    document.getElementById('editNuance').value = data.nuance || '';
+    document.getElementById('editExamples').value = (data.examples || []).join('\n');
+    document.getElementById('editSynonyms').value = (data.synonyms || []).join(', ');
+}
+
+function showNewForm() {
+    isNewWord = true;
+    document.getElementById('formTitle').textContent = "新規単語追加";
+    document.getElementById('viewMode').style.display = 'none';
+    document.getElementById('editMode').style.display = 'block';
+
+    document.getElementById('editWord').value = '';
+    document.getElementById('editCategory').value = currentFilter !== 'ALL' ? currentFilter : '指定なし';
+    document.getElementById('editMeaning').value = '';
+    document.getElementById('editBackground').value = '';
+    document.getElementById('editNuance').value = '';
+    document.getElementById('editExamples').value = '';
+    document.getElementById('editSynonyms').value = '';
+}
+
+function cancelEdit() {
+    showViewMode();
+}
+
+function saveWord() {
+    const word = document.getElementById('editWord').value.trim();
+    if (!word) {
+        alert('単語（表記）は必須入力です。');
+        return;
+    }
+
+    const examplesText = document.getElementById('editExamples').value;
+    const examples = examplesText.split('\n').map(line => line.trim()).filter(line => line !== '');
+
+    const synonymsText = document.getElementById('editSynonyms').value;
+    const synonyms = synonymsText.split(/[,，、\n]/).map(item => item.trim()).filter(item => item !== '');
+
+    if (isNewWord) {
+        const newId = Date.now();
+        const newWordData = {
+            "id": newId,
+            "word": word,
+            "category": document.getElementById('editCategory').value,
+            "meaning": document.getElementById('editMeaning').value.trim(),
+            "background": document.getElementById('editBackground').value.trim(),
+            "nuance": document.getElementById('editNuance').value.trim(),
+            "examples": examples,
+            "synonyms": synonyms
+        };
+        wordData.push(newWordData);
+        currentWordId = newId;
+    } else {
+        const targetWord = wordData.find(w => w.id === currentWordId);
+        targetWord.word = word;
+        targetWord.category = document.getElementById('editCategory').value;
+        targetWord.meaning = document.getElementById('editMeaning').value.trim();
+        targetWord.background = document.getElementById('editBackground').value.trim();
+        targetWord.nuance = document.getElementById('editNuance').value.trim();
+        targetWord.examples = examples;
+        targetWord.synonyms = synonyms;
+    }
+
+    saveToLocalStorage();
+    updateFiltersDisplay();
+    renderSelector();
+    showViewMode();
+}
+
+function deleteCurrentWord() {
+    if (currentWordId === -1) return;
+    const targetWord = wordData.find(w => w.id === currentWordId);
+    if (!confirm(`「${targetWord.word}」を削除してもよろしいですか？`)) return;
+
+    const displayedWords = getProcessedWords();
+    const targetIndex = displayedWords.findIndex(w => w.id === currentWordId);
+    
+    wordData = wordData.filter(w => w.id !== currentWordId);
+    
+    // 次に選択する単語の決定
+    const nextDisplayedWords = getProcessedWords();
+    if (nextDisplayedWords.length === 0) {
+        currentWordId = -1;
+    } else if (targetIndex >= nextDisplayedWords.length) {
+        currentWordId = nextDisplayedWords[nextDisplayedWords.length - 1].id;
+    } else {
+        currentWordId = nextDisplayedWords[targetIndex].id;
+    }
+
+    saveToLocalStorage();
+    updateFiltersDisplay();
+    renderSelector();
+    showViewMode();
+}
+
+// 5. インポート・エクスポート・リセット機能 (複数選択対応)
+function triggerImport() {
+    document.getElementById('fileInput').click();
+}
+
+function importJSON(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const filePromises = Array.from(files).map(file => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    const dataArray = Array.isArray(imported) ? imported : [imported];
+                    resolve(dataArray);
+                } catch (err) {
+                    reject(new Error(`ファイル「${file.name}」の解析に失敗しました。`));
+                }
+            };
+            reader.onerror = () => reject(new Error(`ファイル「${file.name}」の読み込みに失敗しました。`));
+            reader.readAsText(file);
+        });
+    });
+
+    Promise.all(filePromises)
+        .then(results => {
+            let combinedData = results.flat();
+
+            if (combinedData.length === 0 || !combinedData[0].word) {
+                alert('正しい難語JSONデータフォーマットではありません。');
+                return;
+            }
+
+            // インポートデータへのID・カテゴリ補完
+            combinedData.forEach((item, index) => {
+                if (!item.id) item.id = Date.now() + index;
+                if (!item.category) item.category = "指定なし";
+            });
+
+            const isAppend = confirm(
+                `合計 ${files.length} 個のファイルから ${combinedData.length} 件の単語を読み込みました。\n\n` +
+                `現在のリストに「追加」しますか？\n` +
+                `（「キャンセル」を選ぶと現在のリストを消去して「上書き」します）`
+            );
+
+            if (isAppend) {
+                wordData = [...wordData, ...combinedData];
+            } else {
+                wordData = combinedData;
+            }
+
+            currentWordId = wordData.length > 0 ? wordData[0].id : -1;
+            saveToLocalStorage();
+            updateFiltersDisplay();
+            renderSelector();
+            showViewMode();
+            alert('一括インポートが完了しました！');
+        })
+        .catch(error => {
+            alert(error.message);
+        })
+        .finally(() => {
+            event.target.value = '';
+        });
+}
+
+function exportJSON() {
+    if (wordData.length === 0) return;
+    
+    const jsonString = JSON.stringify(wordData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = '難語データ_export.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function resetToDefault() {
+    if (!confirm('データを最初の初期状態に戻しますか？\n自分で追加・編集したデータは消去されます。')) return;
+    
+    wordData = JSON.parse(JSON.stringify(defaultData));
+    currentWordId = wordData[0].id;
+    currentSort = 'id';
+    currentFilter = 'ALL';
+    
+    document.getElementById('sort-id').classList.add('active');
+    document.getElementById('sort-alpha').classList.remove('active');
+    
+    saveToLocalStorage();
+    updateFiltersDisplay();
+    renderSelector();
+    showViewMode();
+}
+
+// 起動
+initApp();
+</script>
+
+</body>
+</html>
