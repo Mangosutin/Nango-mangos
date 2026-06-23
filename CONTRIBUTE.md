@@ -2,14 +2,16 @@
 
 
 ## 開発ルール
-### バージョン命名規則
+### バージョン
+#### 命名規則
 
-ファイル名は 
-* HTML `Nango-neo.vMM_m_P.html` 
-* JS   `Nango_main.vMM.m.p.js `
-* Json `Nango-neo_templare.vMM.p.json`
-* Pack `Nango_v3.10-neo.MM.m.p`
-の形式にしてください。
+|種類|ファイル名|
+|---|---|
+| HTML |`Nango-neo.vMM_m_P.html` 
+| JS   |`Nango_main.vMM.m.p.js `
+| Json |`Nango-neo_templare.vMM.p.json`
+| Pack |`Nango_v3.10-neo.MM.m.p`  
+
 ただし、使用可能でない場合はPackのバージョンを上げないでください
 
 | 部分 | 意味 | 上げるタイミング |
@@ -19,3 +21,13 @@
 | `P` | パッチバージョン | バグ修正・小機能追加 |
 
 例: `v03_10` → `v03_11`（バグ修正） / `v04_00`（レイアウト刷新）
+
+#### 記録形式
+[neo-versions.md](C:\Users\Ariku\OneDrive\Documents\Nango\neo-versions.md)
+に記録します。
+
+>## ファイルの種類はh2
+>###　ファイルのメジャーバージョンはh3
+>#### `構造,変更,`など
+>> ## マイナーバージョンはクオーテーション内h2
+>> ### パッチバージョンはh3
