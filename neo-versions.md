@@ -123,6 +123,45 @@ dict
 * *`"\\"`* (str)  
 AIへの指示文。単語の性質による条件分岐やJavaScriptでは`"\\"`で始まるキーを無視する。
 
->## v02.1
+>## v02.01
 >* idの次に *`"datetime"`*=`"yyyymmdd_HHMM"`　登録日時の項目を追加
 >* *`"memo"`* 条件指示 `記号、文字の説明ならunicodeとjiscodeの記載`を追加
+
+### 3.[v03.00](Nango_templates\Nango-neo_template.v03.00.json)
+Javascript内で形式確認用に使うための変更
+
+#### **構造**
+```
+dict
+    - *`"\\"`* (str)  $words全体指示
+    - *`"words"`* (list[dict...])
+        list  
+            dict  
+                - *`"id"`* (int)
+                - *`"word$"`* ~ *`"english"`* (str)  
+                - *`"column"`* (str)
+                - *`"memo"`* (str)
+                - *`"\\"`* (str)  $memoの条件指示
+                - *`"gemini_note"`* (str)
+                - *`"other_tags"`* (list[str...])
+                - *`"meanings"`* (list[str,dict...])
+                    list
+                        dict
+                            - *`"\\"`* (str)  $meaningsの条件指示
+                            - *`"definition$"`* ~ *`"nuance"`* (str)
+                            - *`"examples"`* (list[str...])  
+                            - *`"synoyms"`* (list[str...])
+```
+* `str型`の値を持つkeyを初めに寄せて、そのあとに`list型`を持つものを集めた。
+
+Jsの形式確認のfor文中で、特別処理が必要な *`"meanigs"`* を最後に行う。
+
+* 必須項目の目印として,該当keyに *`"$"`* を付けた。
+
+Jsでの処理で条件分岐する際に用いほか、手動で単語情報を作製する際にも有用である。
+
+#### **文章形式**
+    雛形
+
+#### **新規項目**
+なし
