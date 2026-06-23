@@ -7,7 +7,7 @@
 ファイル名は 
 * HTML `Nango-neo.vMM_m_P.html` 
 * JS   `Nango_main.vMM.m.p.js `
-* Json `Nango-neo_templare.v02.json`
+* Json `Nango-neo_templare.vMM.p.json`
 * Pack `Nango_v3.10-neo.MM.m.p`
 の形式にしてください。
 ただし、使用可能でない場合はPackのバージョンを上げないでください
