@@ -473,7 +473,7 @@ function triggerImport() { document.getElementById('fileInput').click(); }
 
 function importJSON(event) {
     const files = event.target.files;
-    if (!files || files.length === 0) return;
+    if (!files || files.length === 0) return; //fileを受け取り損ねたら
 
     const filePromises = Array.from(files).map(file => {
         return new Promise((resolve, reject) => {
@@ -489,11 +489,37 @@ function importJSON(event) {
         });
     });
 
-    Promise.all(filePromises)
+    Promise.all(filePromises/*jsonのiter*/)
         .then(results => {
+            /*  results=[
+                [{word1},{word2}],
+                [{word3}] 
+                        ] */
             let combinedData = results.flat();
-            if (combinedData.length === 0 || !combinedData[0].word) {
-                alert('正しい難語JSONデータフォーマットではありません。');
+
+            function WDformatcheck(combone, model) {
+                al_messe = '正しい難語JSONデータフォーマットではありません。'
+                for (let Modkey of object.keys(model)) {
+                    if (Modkey.slice(0, 4) !== "\\") {
+                        if (Modkey.slice(-1) === '$' && !combone[Modkey]) { alert(al_messe); return }
+                        if (typeof model[Modkey] !== 'object') {
+                            if (!combone[Modkey]) {
+                                if (Modkey === 'id') { }//唯一のnum型
+                                else { combone[Modkey] = '' };
+                            }
+                            else if (typeof combone[Modkey] !== model[Modkey]) alert(al_messe);
+                        }
+                        else if (Object.prototype.toString(combone[Modkey]) !== Object.prototype.toString(model[Modkey])) alert(al_messe);
+                        if (Modkey === meanigs$) {
+                            for (let mean_dict of combone[Modkey]) {
+                                if (!mean_dict.definition$) { alert(al_messe); return }
+                            }
+                        }
+                    }
+                }
+            }
+            if (combinedData.length === 0 || !combinedData[0].word/*TODOすべてのデータでwordのチェックをする */) {
+                alert(al_messe);
                 return;
             }
 
