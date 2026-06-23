@@ -1,43 +1,43 @@
 // デフォルト初期データ
 const defaultData = [
-  {
-    "id": 1,
-    "word": "カスケード（cascade）",
-    "category": "外来語",
-    "fieldTag": "エンジニアリング",
-    "eraTag": "現代",
-    "reading": "かすけーど",
-    "kanji": "",
-    "english": "cascade",
-    "meaning": "連鎖的に物事が起きること。または、上から下へ階段状に流れ落ちる滝や、そのように連なるものを指す。",
-    "background": "原語はイタリア語の「cascata（滝）」やラテン語の「cadere（落ちる）」に由来し、元々は「小さな連なった滝」を意味していました。そこから派生して、現代ではIT、ビジネス、科学など様々な分野で「一つの事象が次の事象を芋づる式に引き起こす仕組みや現象」を指す言葉として広く使われています。",
-    "nuance": "単に物事が連続するだけでなく、「上流から下流へ」「1つが引き金となって次々と自動的・不可避的に」伝播していくという、力強い連鎖のニュアンスを含みます。IT分野では機能の連鎖、ビジネスでは方針の浸透、医療では拒絶反応の連鎖など、文脈によってポジティブにもネガティブにも使われます。",
-    "examples": [
-      "経営陣が決定した経営戦略を、各部門へカスケードダウン（一貫して浸透）させる。",
-      "システムの1ヶ所で発生したバグが、カスケード障害を引き起こしてサーバー全体がダウンした。",
-      "CSS（Cascading Style Sheets）は、スタイルの優先順位が上から下へと連鎖的に適用される仕組みに基づいている。"
-    ],
-    "synonyms": ["連鎖", "ドミノ倒し", "波及", "芋づる式", "数珠繋ぎ"]
-  },
-  {
-    "id": 2,
-    "word": "かしずく（傅く）",
-    "category": "古語・大和言葉",
-    "fieldTag": "日常",
-    "eraTag": "中世",
-    "reading": "かしづく",
-    "kanji": "傅く",
-    "english": "",
-    "meaning": "人に仕えて 大事に世話をする。また、子供を大切に養い育てる。",
-    "background": "古語の「かしづく」に由来する言葉です。平安時代の貴族社会において、身分の高い人に仕えて身の回りの世話をすることや、親が大切な我が子をいつくしみ, 手を尽くして育てることを指す言葉として広く使われていました。現代では主に前者の「仕える」という意味合いが強く残っています。",
-    "nuance": "単にお世話をするだけでなく、相手に対して「深い敬意」や「愛情」を持って、至れり尽くせりでもてなすというニュアンスが含まれます。現代の日常会話で使われることは稀で、小説や漫画などの創作物、あるいは格式高い表現の中で、主従関係や献身的な態度を強調する際によく用いられます。",
-    "examples": [
-      "若き女王の周りには、彼女に傅く大勢の侍従たちが控えていた。",
-      "主人の一言で、使用人たちは一斉に傅いて命令に従った。",
-      "両親から蝶よ花よと傅かれて育ったため、彼女は世間知らずなところがある。"
-    ],
-    "synonyms": ["仕える（つかえる）", "かしずき奉る", "お世話する", "奉公する", "傅育する（ふいくする）"]
-  }
+    {
+        "id": 1,
+        "word": "カスケード（cascade）",
+        "category": "外来語",
+        "fieldTag": "エンジニアリング",
+        "eraTag": "現代",
+        "reading": "かすけーど",
+        "kanji": "",
+        "english": "cascade",
+        "meaning": "連鎖的に物事が起きること。または、上から下へ階段状に流れ落ちる滝や、そのように連なるものを指す。",
+        "background": "原語はイタリア語の「cascata（滝）」やラテン語の「cadere（落ちる）」に由来し、元々は「小さな連なった滝」を意味していました。そこから派生して、現代ではIT、ビジネス、科学など様々な分野で「一つの事象が次の事象を芋づる式に引き起こす仕組みや現象」を指す言葉として広く使われています。",
+        "nuance": "単に物事が連続するだけでなく、「上流から下流へ」「1つが引き金となって次々と自動的・不可避的に」伝播していくという、力強い連鎖のニュアンスを含みます。IT分野では機能の連鎖、ビジネスでは方針の浸透、医療では拒絶反応の連鎖など、文脈によってポジティブにもネガティブにも使われます。",
+        "examples": [
+            "経営陣が決定した経営戦略を、各部門へカスケードダウン（一貫して浸透）させる。",
+            "システムの1ヶ所で発生したバグが、カスケード障害を引き起こしてサーバー全体がダウンした。",
+            "CSS（Cascading Style Sheets）は、スタイルの優先順位が上から下へと連鎖的に適用される仕組みに基づいている。"
+        ],
+        "synonyms": ["連鎖", "ドミノ倒し", "波及", "芋づる式", "数珠繋ぎ"]
+    },
+    {
+        "id": 2,
+        "word": "かしずく（傅く）",
+        "category": "古語・大和言葉",
+        "fieldTag": "日常",
+        "eraTag": "中世",
+        "reading": "かしづく",
+        "kanji": "傅く",
+        "english": "",
+        "meaning": "人に仕えて 大事に世話をする。また、子供を大切に養い育てる。",
+        "background": "古語の「かしづく」に由来する言葉です。平安時代の貴族社会において、身分の高い人に仕えて身の回りの世話をすることや、親が大切な我が子をいつくしみ, 手を尽くして育てることを指す言葉として広く使われていました。現代では主に前者の「仕える」という意味合いが強く残っています。",
+        "nuance": "単にお世話をするだけでなく、相手に対して「深い敬意」や「愛情」を持って、至れり尽くせりでもてなすというニュアンスが含まれます。現代の日常会話で使われることは稀で、小説や漫画などの創作物、あるいは格式高い表現の中で、主従関係や献身的な態度を強調する際によく用いられます。",
+        "examples": [
+            "若き女王の周りには、彼女に傅く大勢の侍従たちが控えていた。",
+            "主人の一言で、使用人たちは一斉に傅いて命令に従った。",
+            "両親から蝶よ花よと傅かれて育ったため、彼女は世間知らずなところがある。"
+        ],
+        "synonyms": ["仕える（つかえる）", "かしずき奉る", "お世話する", "奉公する", "傅育する（ふいくする）"]
+    }
 ];
 
 // アプリケーション状態
@@ -66,14 +66,14 @@ function initApp() {
                 if (item.kanji === undefined) item.kanji = "";
                 if (item.english === undefined) item.english = "";
             });
-        } catch(e) {
+        } catch (e) {
             wordData = JSON.parse(JSON.stringify(defaultData));
         }
     } else {
         wordData = JSON.parse(JSON.stringify(defaultData));
         saveToLocalStorage();
     }
-    
+
     // 全ての階層グループを初期状態で展開に設定
     refreshOpenState();
 
@@ -112,27 +112,27 @@ function setHierarchyStructure(structType) {
     document.getElementById('struct-cat').classList.toggle('active', structType === 'category');
     document.getElementById('struct-field').classList.toggle('active', structType === 'fieldTag');
     document.getElementById('struct-era').classList.toggle('active', structType === 'eraTag');
-    
+
     refreshOpenState();
     renderSidebarTree();
 }
 
 function getProcessedWords() {
     let result = [...wordData];
-    
+
     if (searchQuery) {
         result = result.filter(w => {
             return (w.word && w.word.toLowerCase().includes(searchQuery)) ||
-                   (w.reading && w.reading.toLowerCase().includes(searchQuery)) ||
-                   (w.kanji && w.kanji.toLowerCase().includes(searchQuery)) ||
-                   (w.english && w.english.toLowerCase().includes(searchQuery)) ||
-                   (w.fieldTag && w.fieldTag.toLowerCase().includes(searchQuery)) ||
-                   (w.eraTag && w.eraTag.toLowerCase().includes(searchQuery)) ||
-                   (w.meaning && w.meaning.toLowerCase().includes(searchQuery)) ||
-                   (w.synonyms && w.synonyms.some(s => s.toLowerCase().includes(searchQuery)));
+                (w.reading && w.reading.toLowerCase().includes(searchQuery)) ||
+                (w.kanji && w.kanji.toLowerCase().includes(searchQuery)) ||
+                (w.english && w.english.toLowerCase().includes(searchQuery)) ||
+                (w.fieldTag && w.fieldTag.toLowerCase().includes(searchQuery)) ||
+                (w.eraTag && w.eraTag.toLowerCase().includes(searchQuery)) ||
+                (w.meaning && w.meaning.toLowerCase().includes(searchQuery)) ||
+                (w.synonyms && w.synonyms.some(s => s.toLowerCase().includes(searchQuery)));
         });
     }
-    
+
     if (currentSort === 'alpha') {
         result.sort((a, b) => {
             const keyA = a.reading || a.word || '';
@@ -142,7 +142,7 @@ function getProcessedWords() {
     } else {
         result.sort((a, b) => (a.id || 0) - (b.id || 0));
     }
-    
+
     return result;
 }
 
@@ -150,9 +150,9 @@ function getProcessedWords() {
 function renderSidebarTree() {
     const container = document.getElementById('treeContainer');
     container.innerHTML = '';
-    
+
     const processedWords = getProcessedWords();
-    
+
     if (processedWords.length === 0) {
         container.innerHTML = '<div style="font-size:12px; color:var(--muted-color); text-align:center; padding:20px 0;">該当する単語はありません</div>';
         return;
@@ -168,10 +168,10 @@ function renderSidebarTree() {
 
     Object.keys(categorized).sort().forEach(groupName => {
         const words = categorized[groupName];
-        
+
         const categoryDiv = document.createElement('div');
         categoryDiv.className = `tree-category ${openCategories[groupName] ? 'open' : ''}`;
-        
+
         const header = document.createElement('div');
         header.className = 'tree-category-header';
         header.onclick = () => {
@@ -182,7 +182,7 @@ function renderSidebarTree() {
         const titleSpan = document.createElement('span');
         titleSpan.className = 'tree-category-title';
         titleSpan.innerHTML = `<span class="tree-toggle-icon">▶</span> ${groupName} (${words.length})`;
-        
+
         header.appendChild(titleSpan);
         categoryDiv.appendChild(header);
 
@@ -194,7 +194,7 @@ function renderSidebarTree() {
             wordBtn.className = `tree-word-item ${word.id === currentWordId ? 'active' : ''}`;
             wordBtn.textContent = word.word ? word.word.split('（')[0].split('(')[0] : '無題';
             wordBtn.title = word.word;
-            
+
             wordBtn.onclick = () => {
                 currentWordId = word.id;
                 document.querySelectorAll('.tree-word-item').forEach(btn => btn.classList.remove('active'));
@@ -216,7 +216,7 @@ function showViewMode() {
     document.getElementById('editMode').style.display = 'none';
     document.getElementById('managePanelMode').style.display = 'none';
     document.getElementById('viewMode').style.display = 'block';
-    
+
     const target = document.getElementById('viewTarget');
     const editBtn = document.getElementById('editBtn');
     const deleteBtn = document.getElementById('deleteBtn');
@@ -375,9 +375,9 @@ function deleteCurrentWord() {
 
     const processed = getProcessedWords();
     const targetIndex = processed.findIndex(w => w.id === currentWordId);
-    
+
     wordData = wordData.filter(w => w.id !== currentWordId);
-    
+
     const nextProcessed = getProcessedWords();
     if (nextProcessed.length === 0) currentWordId = -1;
     else if (targetIndex >= nextProcessed.length) currentWordId = nextProcessed[nextProcessed.length - 1].id;
@@ -414,7 +414,7 @@ function renderTagManagementTables() {
     // 分野タグテーブル生成
     let fieldHtml = `<table class="tag-table"><thead><tr><th>タグ名</th><th>該当単語数</th><th>操作</th></tr></thead><tbody>`;
     const fieldKeys = Object.keys(fieldsMap).sort();
-    if(fieldKeys.length === 0) fieldHtml += `<tr><td colspan="3" style="color:var(--muted-color); text-align:center;">登録されている分野タグはありません</td></tr>`;
+    if (fieldKeys.length === 0) fieldHtml += `<tr><td colspan="3" style="color:var(--muted-color); text-align:center;">登録されている分野タグはありません</td></tr>`;
     else {
         fieldKeys.forEach(tag => {
             fieldHtml += `<tr>
@@ -430,7 +430,7 @@ function renderTagManagementTables() {
     // 時代タグテーブル生成
     let eraHtml = `<table class="tag-table"><thead><tr><th>タグ名</th><th>該当単語数</th><th>操作</th></tr></thead><tbody>`;
     const eraKeys = Object.keys(erasMap).sort();
-    if(eraKeys.length === 0) eraHtml += `<tr><td colspan="3" style="color:var(--muted-color); text-align:center;">登録されている時代タグはありません</td></tr>`;
+    if (eraKeys.length === 0) eraHtml += `<tr><td colspan="3" style="color:var(--muted-color); text-align:center;">登録されている時代タグはありません</td></tr>`;
     else {
         eraKeys.forEach(tag => {
             eraHtml += `<tr>
@@ -448,9 +448,9 @@ function renderTagManagementTables() {
 function renameTag(tagType, oldTagName) {
     const label = tagType === 'fieldTag' ? '分野タグ' : '時代タグ';
     const newTagName = prompt(`現在の${label}名: 「${oldTagName}」\n新しいタグ名を入力してください（空にするとタグが削除されます）:`, oldTagName);
-    
+
     if (newTagName === null) return; // キャンセル
-    
+
     const trimmedNewTag = newTagName.trim();
     let count = 0;
 
@@ -547,7 +547,7 @@ function resetToDefault() {
     document.getElementById('struct-cat').classList.add('active');
     document.getElementById('struct-field').classList.remove('active');
     document.getElementById('struct-era').classList.remove('active');
-    
+
     refreshOpenState();
     saveToLocalStorage();
     renderSidebarTree();

@@ -3,7 +3,7 @@
   "words": [
     {
       "id": 1,
-      "datetime":"yyyymmdd_HHMM",
+      "datetime": "yyyymmdd_HHMM",
       "word": "単語名（表記）",
       "category": "カテゴリ",
       "fieldTag": "分野タグ",
