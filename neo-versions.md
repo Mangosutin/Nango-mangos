@@ -12,11 +12,12 @@
 ### 1. v01.0.0
 #### 変更
         - javascript inline ->  import
-        - 
+
 
 ## JavaScript version
 
 ## Json version
+* 辞書のキーは　```*`"key"`*```と書く
 ### 0. [base(v03.10)](Nango_templates\template_v03_10_v04_xx.json)
 #### **文書形式**
     例+雛形
@@ -121,3 +122,7 @@ dict
 
 * *`"\\"`* (str)  
 AIへの指示文。単語の性質による条件分岐やJavaScriptでは`"\\"`で始まるキーを無視する。
+
+>## v02.1
+>* idの次に *`"datetime"`*=`"yyyymmdd_HHMM"`　登録日時の項目を追加
+>* *`"memo"`* 条件指示 `記号、文字の説明ならunicodeとjiscodeの記載`を追加
