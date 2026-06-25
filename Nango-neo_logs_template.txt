@@ -1,5 +1,0 @@
-
-yyyy_mm_dd_HH_MM_SS Operation:import jsonfile
-yyyy_mm_dd_HH_MM_SS     ASK:chose file (selected=[,,])
-yyyy_mm_dd_HH_MM_SS     ERROR:format error filename,
-yyyy_mm_dd_HH_MM_SS     ERROR:
