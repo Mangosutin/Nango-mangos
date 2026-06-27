@@ -1,0 +1,23 @@
+{
+    "id":"chr",
+    "datetime":"chr",
+    "word":"chr$RQ",
+    "category":"chr",
+    "fieldTag":"chr",
+    "eraTag":"chr",
+    "reading":"chr",
+    "kanji":"chr",
+    "english":"chr",
+    "column":"chr",
+    "memo":"chr",
+    "gemini_note":"chr",
+    "other_tags":"list",
+    "meanings":"list$RQ$NS",
+    "NS$meanings":{
+    "definition":"chr$RQ",
+    "background":"chr",
+    "nuance":"chr",
+    "examples":"list",
+    "synonyms":"list"
+    }
+}
