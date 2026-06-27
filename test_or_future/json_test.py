@@ -89,8 +89,65 @@ def imp_modelFMT(model: dict, nest_parent: str = ""):
                     return "ERROR"
     return key_cls, key_vtype
 
-
-
+def JSON_FMT_checker(subj: dict, cls, vtype, nest_parent: str = ""):
+    print("[DEBUG] loading word...")
+    if nest_parent:
+        print("[DEBUG] nest process children parent:", nest_parent)
+    for k, v in subj.items():
+        if k in cls["RQ"]:
+            cls["RQ"].remove(k)
+            if (v is None) or not bool(v):
+                print("[ERROR] RQ key {k} should have {vtype[k]} value,value={v}")
+                print("k", end=":")
+                pprint(k)
+                print("vtype[k]", end=":")
+                pprint(vtype[k])
+                print("v", end=":")
+                pprint(v)
+                return "ERROR"
+        if k in cls["NS"]:
+            if not isinstance(v, list):
+                print("[ERROR] NS key {k} should have list value,value={v}")
+                print("k", end=":")
+                pprint(k)
+                print("v", end=":")
+                pprint(v)
+                return "ERROR"
+            else:
+                for i, vv in enumerate(v):
+                    checked_vv = JSON_FMT_checker(vv, *vtype["NS$" + k], nest_parent=nest_parent + ">" + k)
+                    if checked_vv == "ERROR":
+                        return "ERROR"
+                    else:
+                        v[i] = checked_vv
+        else:
+            try:
+                if isinstance(v, list) and vtype[k] == "list":
+                    pass
+                elif isinstance(v, (int, float, str)) and vtype[k] == "chr":
+                    pass
+                elif isinstance(v, dict):
+                    print("[ERROR] When using a dictionary as a value, you must request it as an NS.")
+                    return "ERROR"
+                else:
+                    print("[ERROR] Value type is uncomfortable")
+                    return "ERROR"
+            except KeyError:  # 登録されていないkey
+                pass
+    for rq_key in cls["RQ"]:
+        print("[ERROR]lack require keys")
+        pprint(cls["RQ"])
+        return "ERROR"
+    # クレンジング
+    for opk in cls["OP"]:
+        if opk not in subj.keys():
+            if opk in cls["NS"]:
+                subj[opk] = JSON_FMT_checker({}, cls["NSchild"][cls["NS"].index(k)])
+            elif vtype[opk] == "list":
+                subj[opk] = []
+            else:
+                subj[opk] = ""
+    return subj
 if __name__ == "__main__":
     from pprint import pprint
 
@@ -102,4 +159,6 @@ if __name__ == "__main__":
             row_db = json.loads(smp_ld.read())
             subj = row_db["words"][0]
             key_class, value_types = imp_modelFMT(json.loads(mdl_ld.read()))
-            
+            adapted = JSON_FMT_checker(subj, key_class, value_types)
+            adapted_json = json.dumps(adapted, sort_keys=0, ensure_ascii=False, indent=2)
+            pprint(adapted_json)
