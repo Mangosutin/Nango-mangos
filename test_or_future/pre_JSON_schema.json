@@ -3,11 +3,14 @@
     "title": "Nango-neo pre_JSON_schema",
     "description": "this is test",
     "type": "object",
+    "required": ["words"],
     "properties": {
         "words": {
             "type": "array",
             "items": {
                 "type": "object",
+                "required": ["word", "meanings"],
+                "additionalProperties": true,
                 "properties": {
                     "id": { "type": "integer" },
                     "datetime": {
@@ -29,19 +32,23 @@
                         "type": "array",
                         "items": { "type": "string" }
                     },
-                    "meaning": {
-                        "type": "object",
-                        "properties": {
-                            "definition": { "type": "string" },
-                            "background": { "type": "string" },
-                            "nuance": { "type": "string" },
-                            "examples": {
-                                "type": "array",
-                                "items": { "type": "string" }
-                            },
-                            "synonyms": {
-                                "type": "array",
-                                "items": { "type": "string" }
+                    "meanings": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": ["definition"],
+                            "properties": {
+                                "definition": { "type": "string" },
+                                "background": { "type": "string" },
+                                "nuance": { "type": "string" },
+                                "examples": {
+                                    "type": "array",
+                                    "items": { "type": "string" }
+                                },
+                                "synonyms": {
+                                    "type": "array",
+                                    "items": { "type": "string" }
+                                }
                             }
                         }
                     }
