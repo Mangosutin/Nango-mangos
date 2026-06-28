@@ -4,7 +4,8 @@
     "ruff.lineLength": 120,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "[json]": {
-        "editor.formatOnSave": false
+        "editor.formatOnSave": false,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     // オブジェクトの括弧内にスペースを入れる設定（1行のときに見やすくなります）
     "prettier.bracketSpacing": true,
