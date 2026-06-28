@@ -1,9 +1,8 @@
 {
-  "words": [
-    {
+  "words": {
+    "単語名（表記)":{
       "id": 1,
       "datetime": "yyyymmdd_HHMM",
-      "word": "単語名（表記)",
       "category": "カテゴリ",
       "eraTag": "時代区分タグ",
       "reading": "よみがな",
@@ -24,5 +23,5 @@
         }
       ]
     }
-  ]
+  }
 }
