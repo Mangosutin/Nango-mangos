@@ -32,25 +32,25 @@
               "items": { "type": "string" }
             },
             "meanings": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": ["definition"],
-                "properties": {
-                  "definition": { "type": "string" },
-                  "background": { "type": "string" },
-                  "nuance": { "type": "string" },
-                  "fieldTag": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  },
-                  "examples": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  },
-                  "synonyms": {
-                    "type": "array",
-                    "items": { "type": "string" }
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "type": "object",
+                  "properties": {
+                    "background": { "type": "string" },
+                    "nuance": { "type": "string" },
+                    "fieldTag": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "examples": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "synonyms": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
                   }
                 }
               }
