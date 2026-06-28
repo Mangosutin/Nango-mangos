@@ -1,5 +1,10 @@
 {
-    "cSpell.words": ["Ariku", "Nango", "Scode"],
+    "cSpell.words": [
+        "Ariku",
+        "isect",
+        "Nango",
+        "Scode"
+    ],
     "black-formatter.args": ["--line-length", "120"],
     "ruff.lineLength": 120,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
