@@ -1,7 +1,8 @@
 {
     "cSpell.words": [
         "Ariku",
-        "Nango"
+        "Nango",
+        "Scode"
     ],
     "black-formatter.args": [
         "--line-length",
