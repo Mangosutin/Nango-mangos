@@ -9,5 +9,7 @@
     },
     // オブジェクトの括弧内にスペースを入れる設定（1行のときに見やすくなります）
     "prettier.bracketSpacing": true,
-    "prettier.tabWidth": 4
+    "prettier.tabWidth": 2,
+    "python.analysis.autoImportCompletions": true,
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }
