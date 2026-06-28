@@ -20,7 +20,6 @@
                     },
                     "word": { "type": "string" },
                     "category": { "type": "string" },
-                    "fieldTag": { "type": "string" },
                     "eraTag": { "type": "string" },
                     "reading": { "type": "string" },
                     "kanji": { "type": "string" },
@@ -41,6 +40,10 @@
                                 "definition": { "type": "string" },
                                 "background": { "type": "string" },
                                 "nuance": { "type": "string" },
+                                "fieldTag": {
+                                    "type": "array",
+                                    "items": { "type": "string" }
+                                },
                                 "examples": {
                                     "type": "array",
                                     "items": { "type": "string" }
