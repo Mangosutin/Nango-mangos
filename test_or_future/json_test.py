@@ -3,13 +3,13 @@ from jsonschema import Draft202012Validator
 from jsonschema.exceptions import ValidationError
 
 
-def JSON_loader(subject, schema):
+def JSON_load_word(subject, schema):
     try:
         validator = Draft202012Validator(schema)
-        validator.validate(sample)
-        adapted_json = json.dumps(sample, sort_keys=0, ensure_ascii=False, indent=2)
+        validator.validate(subject)
+        adapted_json = json.dumps(subject, sort_keys=0, ensure_ascii=False, indent=2)
         print(adapted_json)
-        return sample
+        return subject
     except ValidationError as e:
         print(e.message)
     print("END")
@@ -24,4 +24,4 @@ if __name__ == "__main__":
             sample = json.loads(smp_ld.read())
             schema = json.loads(sch_ld.read())
 
-            JSON_loader(sample, schema)
+            JSON_load_word(sample, schema)
