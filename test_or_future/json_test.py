@@ -42,7 +42,7 @@ def imp_modelFMT(model: dict, nest_parent: str = ""):
     }
     key_vtype = {}
     for i, (k, v) in enumerate(list(model.items())):
-        if not set([k[:3], k[:4]]).isdisjoint(set(["NS$", "\\\\"])):
+        if not set([k[:3], k[:4]]).isdisjoint(set(["NS$", "//"])):
             continue
         # valueをattributeに分割
         attribute = v.split("$")
