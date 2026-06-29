@@ -69,7 +69,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "pattern": ".{6}_.{4}"
+            "pattern": ".{6}_.{4}\n.*"
           }
         }
       ]
