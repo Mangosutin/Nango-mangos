@@ -11,7 +11,6 @@
         ".*": {
           "type": "object",
           "required": ["meanings"],
-          "additionalProperties": true,
           "properties": {
             "id": { "type": "integer" },
             "datetime": {
@@ -58,6 +57,18 @@
           }
         }
       }
+    },
+    "additional_data": {
+      "anyOf": [
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": ".{6}_.{4}"
+          }
+        }
+      ]
     }
   }
 }

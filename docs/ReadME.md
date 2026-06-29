@@ -53,3 +53,8 @@ python module
 |FMTチェック|jsonschema|Draft2020-12に対応しているv4.0.0以降|
 |差分抽出(重複時)|DeepDiff||
 
+### `additional data`について
+
+本プロジェクトにおいて、JSONのデータファイルに規定されていない項目を保存することは認めています。そしてそれは、`JSON>root`の`"additional":iterable`内に`list[string]`で収納してください。
+
+これは、`DeepDiff module`の仕様によって、重複処理をする際に`words`のデータの`key`が大きく変わることは避ける必要があるためです。

@@ -29,5 +29,6 @@
         }
       ]
     }
-  }
+  },
+  "additional_data":["yyyymmdd_HHMM\\nその他の情報。空欄で良し"]
 }
