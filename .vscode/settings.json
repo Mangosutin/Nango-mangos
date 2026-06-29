@@ -16,5 +16,5 @@
     "prettier.bracketSpacing": true,
     "prettier.tabWidth": 2,
     "python.analysis.autoImportCompletions": true,
-    "python-envs.defaultEnvManager": "ms-python.python:system"
+    "python-envs.defaultEnvManager": "ms-python.python:venv"
 }
