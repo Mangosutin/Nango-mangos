@@ -19,5 +19,11 @@
     "python-envs.defaultEnvManager": "ms-python.python:venv",
     "[markdown]": {
         "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[html]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
     }
 }
