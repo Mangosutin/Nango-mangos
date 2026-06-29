@@ -1,7 +1,7 @@
 {
   "//comment_words": "必須項目です。日本で使われる中で意味が変化した外来語（和製英語など）について質問された場合は、本来の原語（英語など）の説明を行うオブジェクトを、2つ目の要素としてこの 'words' リスト内に追加してください。",
   "words": {
-    "単語名":{
+    "単語名": {
       "id": 1,
       "datetime": "yyyymmdd_HHMM",
       "//comment_category": "大和言葉、英語、外来語など、言語的な分類を示してください。",
@@ -30,5 +30,5 @@
       ]
     }
   },
-  "additional_data":["yyyymmdd_HHMM\\nその他の情報。空欄で良し"]
+  "additional_data": ["yyyymmdd_HHMM\\nその他の情報。空欄で良し"]
 }
