@@ -1,32 +1,34 @@
 {
-    "cSpell.words": [
-        "Ariku",
-        "isect",
-        "Nango",
-        "Scode"
-    ],
-    "black-formatter.args": ["--line-length", "120"],
-    "ruff.lineLength": 50,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "[json]": {
-        "editor.formatOnSave": false,
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    // オブジェクトの括弧内にスペースを入れる設定（1行のときに見やすくなります）
-    "prettier.bracketSpacing": true,
-    "prettier.tabWidth": 2,
-    "python.analysis.autoImportCompletions": true,
-    "python-envs.defaultEnvManager": "ms-python.python:venv",
-    "[markdown]": {
-        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
-    },
-    "[javascript]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
-    },
-    "[html]": {
-        "editor.defaultFormatter": "vscode.html-language-features"
-    },
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter"
-    }
+  "cSpell.words": [
+    "Ariku",
+    "isect", //intersectionの略
+    "Nango",
+    "vscode",
+    "MYNangos", //personalised Nango app
+    "MYpedia" //personalised pedia app,advanced Nango
+  ],
+  "black-formatter.args": ["--line-length", "120"],
+  "ruff.lineLength": 50,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[json]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  // オブジェクトの括弧内にスペースを入れる設定（1行のときに見やすくなります）
+  "prettier.bracketSpacing": true,
+  "prettier.tabWidth": 2,
+  "python.analysis.autoImportCompletions": true,
+  "python-envs.defaultEnvManager": "ms-python.python:venv",
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  }
 }

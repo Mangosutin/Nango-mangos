@@ -25,7 +25,7 @@
 | HTML | `Nango-neo.vMM_m_P.html`        |
 | JS   | `Nango_main.vMM.m.p.js`         |
 | Json | `Nango-neo_template.vMM.p.json` |
-| Pack | `Nango_v3.10-neo.MM.m.p`        |
+| Pack | `Nango_v3.10-neo.MM.m.p.zip`    |
 
 ただし、使用可能でない場合はPackのバージョンを上げないでください
 
@@ -38,6 +38,8 @@
 例: `v03_10` → `v03_11`（バグ修正） / `v04_00`（レイアウト刷新）
 
 #### version変更記録の形式
+
+毎回必須ではありません。パック更新時はお願いします。
 
 [neo-versions.md](C:\Users\Ariku\OneDrive\Documents\Nango\neo-versions.md)
 に記録します。

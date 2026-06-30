@@ -20,19 +20,20 @@ Nango
 │      ReadME.md
 │      Where am I drifting to.md
 │
-├─Nango_v3.10-neo.01.0.0
+├─Nango-neo  \\main
 │  │  Nango-neo.v01.1.0.html
 │  │  Nango_main.v01.0.0.js
 │  │
-│  └─DTformats
-│          Nango-neo_DTinstruction.v03.10.txt
-│          Nango-neo_DTtemplate.v03.10.json
+│  └─DTformats.neo.v5.12
+│          DF-FMT_schema.v01.12.json
+│          DT-FMT_instruction_AI.v01.12.json
+│          DT-FMT_template.v02.12.json
 │
-├─Nango_v3.10-neo_archives
-│      Nango_v3.10-neo.01.0.0.zip
-│
-└─test_or_future
-        app.py
+└─test_or_future  \\試験的,原則 new branch
+        json_test.py
+        pre_JSON_schema.json
+        sample.json
+
 ```
 
 ## DB
@@ -41,7 +42,7 @@ Nango
 形式設定:`JSON schema Draft 2020-12`
 保存場所:未決定 `flask`によるpythonサーバーの作成をしながら決めます。
 
-詳細なFMTは`Nango_v3.10-neo.xx.x.x\DTformats\`を確認してください。
+詳細なFMTは`Nango-neo\DTformats\`を確認してください。
 
 ### 操作
 
